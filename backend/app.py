@@ -1,6 +1,12 @@
 from flask import Flask
+import os
 
 app = Flask(__name__)
+
+@app.route('/')
+def serve_index():
+    return send_from_directory(os.path.join(app.root_path, 'build'), 'index.html')
+
 
 @app.route('/api/hello')
 def hello():
