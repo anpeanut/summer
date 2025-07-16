@@ -1,3 +1,0 @@
-
-# summer
-summer
