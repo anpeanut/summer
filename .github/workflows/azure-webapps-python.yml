@@ -40,6 +40,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set env var
+        run: echo "PROJECT_CODE_DIR=backend" >> $GITHUB_ENV
+
       - name: Set up Python version
         uses: actions/setup-python@v3.0.0
         with:
@@ -52,7 +55,9 @@ jobs:
           source venv/bin/activate
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          cd ${{ env.PROJECT_CODE_DIR }}
+          pip install -r requirements.txt
 
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
