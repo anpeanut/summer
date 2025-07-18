@@ -27,16 +27,19 @@ jobs:
         with:
           node-version: 22 # 指定 Node 版本
       
-      # 步骤3：安装依赖包
-      - name: 安装 npm 依赖
-        working-directory: ./frontend  # 指定子目录
-        run: npm install    # 等同于本地运行
-      
-      # 步骤4：构建 React 应用
-      - name: 构建生产包
+      # 步骤3：清理缓存并安装依赖包
+      - name: 清理缓存并安装 npm 依赖
         working-directory: ./frontend  # 指定子目录
         run: |
-            npm run clean
+            rm -rf build  
+            rm -rf node_modules/.cache  
+            npm install
+      
+      
+      # 步骤4：构建 React 应用
+      - name: 清理并构建生产包
+        working-directory: ./frontend  # 指定子目录
+        run: 
             npm run build
 
         
