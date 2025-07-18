@@ -54,3 +54,10 @@ jobs:
           app_location: "frontend"
           # 构建输出目录（React 默认为 build）
           output_location: "build"
+          action: "upload"  # 指定操作类型
+          app_build_command: "npm run build"  # 构建应用的命令
+          skip_app_build: false  # 是否跳过应用构建
+          production_branch: "main"  # 生产分支
+          deployment_environment: "production"  # 部署环境
+          github_id_token: ${{ github.token }}  # GitHub ID 令牌
+
