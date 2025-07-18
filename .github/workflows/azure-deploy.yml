@@ -2,11 +2,12 @@
 name: Azure 前端react自动部署流水线（static web apps）
 
 # 触发条件：当代码推送到 main 分支时启动
-on:
+on: 
   push:
     branches: [ "main" ]  # 监控 main 分支
     paths: 
       - 'frontend/**'  # 仅监控前端目录变更
+  workflow_dispatch:  # 支持手动触发工作流
 
 # 任务列表（一个任务 = 一台虚拟机执行）
 jobs:
