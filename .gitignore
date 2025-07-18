@@ -5,6 +5,7 @@
 /frontend/node_modules
 /.pnp
 /frontend/.pnp
+/someinformations
 .pnp.js
 
 # testing
@@ -24,4 +25,3 @@
 
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
