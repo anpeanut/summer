@@ -7,6 +7,7 @@
 # pnp
 /.pnp
 /frontend/.pnp
+/someinformations
 .pnp.js
 
 # 测试覆盖率
@@ -26,4 +27,5 @@
 
 npm-debug.log*
 yarn-debug.log*
+
 yarn-error.log*
