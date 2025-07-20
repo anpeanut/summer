@@ -66,8 +66,8 @@ jobs:
         with:
           name: python-app
           path: |
-            .
-            !venv/
+            backend/**/*  # 仅包含 backend 目录下的所有文件
+            !backend/venv/  # 排除 backend 内可能存在的虚拟环境（如有）
 
   deploy:
     permissions:
