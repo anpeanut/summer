@@ -67,8 +67,8 @@ jobs:
         with:
           name: python-app
           path: |
-            ${{ env.PROJECT_CODE_DIR }}/**/*  # 上传 backend 目录（含所有文件）
-            !${{ env.PROJECT_CODE_DIR }}/venv/**/*  # 排除虚拟环境
+            ./${{ env.PROJECT_CODE_DIR }}/**/*  # 上传 backend 目录（含所有文件）
+            ./!${{ env.PROJECT_CODE_DIR }}/venv/**/*  # 排除虚拟环境
 
   deploy:
     permissions:
