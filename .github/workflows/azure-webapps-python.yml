@@ -20,8 +20,9 @@
 name: Build and deploy Python app to Azure Web App
 
 env:
-  AZURE_WEBAPP_NAME: SummerProject  # set this to the name of your Azure Web App
-  PYTHON_VERSION: '3.13'              # set this to the Python version to use
+  AZURE_WEBAPP_NAME: SummerProject  # 你的 Azure Web App 名称
+  PYTHON_VERSION: '3.13'              # Python 版本
+  PROJECT_CODE_DIR: backend  # 直接定义后端目录，避免重复配置（新增）
 
 on:
   push:
@@ -36,12 +37,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set env var
-        run: echo "PROJECT_CODE_DIR=backend" >> $GITHUB_ENV
 
       - name: Set up Python version
         uses: actions/setup-python@v5
@@ -54,20 +51,18 @@ jobs:
           python -m venv venv
           source venv/bin/activate
 
-      - name: Install dependencies
+      - name: Install dependencies (from backend/requirements.txt)
         run: |
-          cd ${{ env.PROJECT_CODE_DIR }}
+          cd ${{ env.PROJECT_CODE_DIR }}  # 进入 backend 目录安装依赖
           pip install -r requirements.txt
 
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
-
-      - name: Upload artifact for deployment jobs
+      - name: Upload artifact (only backend directory)  # 修改：仅上传 backend
         uses: actions/upload-artifact@v4
         with:
           name: python-app
           path: |
-            backend/**/*  # 仅包含 backend 目录下的所有文件
-            !backend/venv/  # 排除 backend 内可能存在的虚拟环境（如有）
+            ${{ env.PROJECT_CODE_DIR }}/**/*  # 仅 backend 目录下的所有文件
+            !${{ env.PROJECT_CODE_DIR }}/venv/  # 排除可能的虚拟环境
 
   deploy:
     permissions:
@@ -83,7 +78,15 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: python-app
-          path: .
+          path: .  # 当前目录会有 backend 文件夹（里面是应用文件）
+
+      - name: Move backend files to root (for Azure deployment)  # 新增：调整文件结构
+        run: |
+          # 将 backend 内的所有文件移动到根目录（Azure 需要应用文件在根目录）
+          if [ -d "backend" ]; then
+            mv backend/* .
+            rm -rf backend  # 删除空的 backend 目录
+          fi
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
