@@ -44,7 +44,7 @@ jobs:
         run: echo "PROJECT_CODE_DIR=backend" >> $GITHUB_ENV
 
       - name: Set up Python version
-        uses: actions/setup-python@v3.13.0
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
