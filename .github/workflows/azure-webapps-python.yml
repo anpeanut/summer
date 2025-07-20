@@ -61,8 +61,8 @@ jobs:
         with:
           name: python-app
           path: |
-            ${{ env.PROJECT_CODE_DIR }}/**/*  # 仅 backend 目录下的所有文件
-            !${{ env.PROJECT_CODE_DIR }}/venv/  # 排除可能的虚拟环境
+            ${{ env.PROJECT_CODE_DIR }}/  # 上传 backend 目录（含所有文件）
+            !${{ env.PROJECT_CODE_DIR }}/venv/  # 排除虚拟环境
 
   deploy:
     permissions:
@@ -84,8 +84,8 @@ jobs:
         run: |
           # 将 backend 内的所有文件移动到根目录（Azure 需要应用文件在根目录）
           if [ -d "backend" ]; then
-            mv backend/* .
-            rm -rf backend  # 删除空的 backend 目录
+            mv ${{ env.PROJECT_CODE_DIR }}/* .  # 将 backend 内的文件移到根目录
+          rm -rf ${{ env.PROJECT_CODE_DIR }}  # 删除空的 backend 目录
           fi
 
       - name: 'Deploy to Azure Web App'
