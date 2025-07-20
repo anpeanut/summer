@@ -56,6 +56,12 @@ jobs:
           cd ${{ env.PROJECT_CODE_DIR }}  # 进入 backend 目录安装依赖
           pip install -r requirements.txt
 
+      - name: Check backend directory structure (调试用)
+        run: |
+          echo "Current working directory: $(pwd)"
+          echo "Files in backend directory:"
+          ls -la ${{ env.PROJECT_CODE_DIR }}/  # 列出 backend 目录下的所有文件
+
       - name: Upload artifact (only backend directory)  # 修改：仅上传 backend
         uses: actions/upload-artifact@v4
         with:
