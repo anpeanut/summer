@@ -1,5 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# 虚拟环境
+/venv
+
 # 依赖
 /node_modules
 /frontend/node_modules
@@ -13,11 +16,11 @@
 
 # 测试覆盖率
 /coverage
-/frontend/coverage
 
 # 生产构建
 /build
-/frontend/build
+#/public
+#/src
 
 # 杂项
 .DS_Store
