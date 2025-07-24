@@ -4,6 +4,7 @@
 /node_modules
 /frontend/node_modules
 
+
 # pnp
 /.pnp
 /frontend/.pnp
