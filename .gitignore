@@ -1,5 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# 虚拟环境
+/venv
+
 # 依赖
 /node_modules
 /frontend/node_modules
