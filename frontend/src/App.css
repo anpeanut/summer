@@ -1,38 +1,43 @@
-.App {
-  text-align: center;
+/* 全局样式重置，消除浏览器默认边距 */
+body {
+  margin: 0;
+  font-family: sans-serif;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* 这是最外层的大容器 */
+.app-container {
+  display: flex; /* 关键！启用Flexbox布局 */
+  flex-direction: row; /* 内部元素横向排列 */
+  height: 100vh; /* 高度占满整个浏览器窗口 */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* 左侧的地图区域 */
+.map-area {
+  flex-grow: 1; /* “贪婪”属性，占据所有剩余空间 */
+  border-right: 1px solid #ccc; /* 右边加一条线，用于分隔 */
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* 右侧的侧边栏 */
+.sidebar {
+  width: 300px; /* 固定宽度为300像素 */
+  padding: 16px; /* 内部留出一些边距，让内容不贴边 */
+  box-sizing: border-box; /* 确保内边距不会增加盒子的总宽度 */
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  flex-direction: column; /* 侧边栏内部的元素（信息和按钮）是纵向排列的 */
+  gap: 20px; /* 在信息和按钮之间增加一些空隙 */
+}
+
+/* 按钮的基本样式 */
+button {
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer; /* 鼠标放上去时显示小手图标 */
+  border: 1px solid #007bff;
+  background-color: #007bff;
   color: white;
+  border-radius: 5px; /* 圆角 */
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+button:hover {
+  background-color: #0056b3; /* 鼠标悬停时变色 */
 }
