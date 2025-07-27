@@ -105,7 +105,7 @@ def surprise():
     return render_template('surprise.html') 
 
 def get_api_doc():
-    docs_path = os.path.join(os.path.dirname(__file__), 'Docs')
+    docs_path = os.path.join(os.path.dirname(__file__), 'project_docs')
     api_md_path = os.path.join(docs_path, 'API.md')
     if os.path.exists(api_md_path):
         with open(api_md_path, 'r', encoding='utf-8') as f:
