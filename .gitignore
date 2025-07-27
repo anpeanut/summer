@@ -31,5 +31,7 @@
 
 npm-debug.log*
 yarn-debug.log*
-
 yarn-error.log*
+
+# 忽略前端项目中的环境变量文件
+/frontend/.env
