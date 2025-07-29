@@ -28,13 +28,14 @@ function App() {
 
   return (
     <div className="app-container">
-      <div className="map-area">
-        <Map data={countryData} />
-      </div>
       <div className="sidebar">
         <CountryInfo data={countryData} />
         <FetchButton onClick={handleFetchCountry} isLoading={isLoading} />
       </div>
+      <div className="map-area">
+        <Map data={countryData} />
+      </div>
+
     </div>
   );
 }

@@ -44,6 +44,8 @@ function Map({ data }: MapProps) {
     // ref 用于获取 MapContainer 的实例，以便直接调用 flyTo 等方法
     <MapContainer ref={mapRef} center={displayPosition} zoom={defaultZoom} style={{ height: '100%', width: '100%' }}>
       <TileLayer
+        //attribution='&copy; <a href="https://www.geoq.cn">智图</a>'
+        //url="https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
