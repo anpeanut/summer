@@ -1,3 +1,4 @@
+'''
 from flask import Flask, render_template, jsonify, request
 from datetime import datetime
 from typing import Dict, Any, Optional
@@ -118,3 +119,11 @@ def API_doc():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
+'''
+from app import create_app
+
+app = create_app()
+
+if __name__ == '__main__':
+    app.run(debug=True)

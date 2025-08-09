@@ -35,3 +35,6 @@ yarn-error.log*
 
 # 忽略前端项目中的环境变量文件
 /frontend/.env
+
+# 忽略后端项目中的环境变量文件
+/backend/.env
