@@ -19,12 +19,12 @@ body {
 
 /* 右侧的侧边栏 */
 .sidebar {
-  width: 300px; /* 固定宽度为300像素 */
+  width: 400px; /* 将宽度调整为400px以容纳时间轴 */
   padding: 16px; /* 内部留出一些边距，让内容不贴边 */
   box-sizing: border-box; /* 确保内边距不会增加盒子的总宽度 */
   display: flex;
   flex-direction: column; /* 侧边栏内部的元素（信息和按钮）是纵向排列的 */
-  gap: 20px; /* 在信息和按钮之间增加一些空隙 */
+  height: 100vh; /* 关键：让侧边栏高度占满整个视窗 */
 }
 
 /* 按钮的基本样式 */
@@ -40,4 +40,21 @@ button {
 
 button:hover {
   background-color: #0056b3; /* 鼠标悬停时变色 */
+}
+
+/* 定义一个“淡入并上浮”的动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 应用这个动画的CSS类 */
+.timeline-item-appear {
+  animation: fadeInUp 0.5s ease-out forwards;
 }
