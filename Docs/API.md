@@ -34,6 +34,25 @@
     "location": {
       "type": "Point",
       "coordinates": [104.1954, 35.8617]
+    },
+    "geoJson": {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "properties": {},
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [109.6, 18.2],
+                [109.6, 18.2],
+                [109.6, 18.2]
+              ]
+            ]
+          }
+        }
+      ]
     }
   },
   "metadata": {
@@ -62,6 +81,7 @@
 | population | number  | ✓    | 人口数量                      | 1412000000           |
 | capital    | string  | ✓    | 首都名称                      | "北京"               |
 | location   | object  | ✓    | 地理位置信息                  | { ... }              |
+| geoJson    | object  | ✓    | 国家地理边界 (GeoJSON)        | { ... }              |
 
 #### 位置对象 (location)
 | 字段        | 类型   | 必填 | 说明                          | 示例值                |
@@ -99,4 +119,3 @@
 | code     | string | ✓    | 错误代码                 | "404"                       |
 | message  | string | ✓    | 错误摘要信息             | "Country not found"         |
 | details  | string | ✗    | 详细错误信息 (可选)      | "The requested country..."  |
-

@@ -5,18 +5,19 @@ import CircularProgress from '@mui/material/CircularProgress';
 type FetchButtonProps = {
   onClick: () => void;
   isLoading: boolean;
+  text: string; // 按钮上显示的文字
 };
 
-function FetchButton({ onClick, isLoading }: FetchButtonProps) {
+function FetchButton({ onClick, isLoading, text }: FetchButtonProps) {
   return (
     <Button
       variant="contained"
       onClick={onClick}
       disabled={isLoading}
-      // 添加最小高度以防止加载时布局变化
-      sx={{ position: 'relative', minHeight: '36.5px' }}
+      // 增加外边距，使其与下方的卡片分开
+      sx={{ position: 'relative', minHeight: '36.5px', mb: 2 }}
     >
-      {/* 加载时显示菊花图，否则显示文字 */}
+      {/* 加载时显示菊花图，否则显示来自props的文字 */}
       {isLoading ? (
         <CircularProgress
           size={24}
@@ -26,7 +27,7 @@ function FetchButton({ onClick, isLoading }: FetchButtonProps) {
           }}
         />
       ) : (
-        '获取一个随机国家'
+        text
       )}
     </Button>
   );
