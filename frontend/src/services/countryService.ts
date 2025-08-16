@@ -48,6 +48,8 @@ export const fetchCountryData = async (): Promise<CountryDataExtended> => {
     // --- 这是连接真实后端的代码路径 ---
     console.log("【模式】: 尝试从后端API获取数据 (/api/country)");
     try {
+      console.log("USE_MOCK =", process.env.REACT_APP_USE_MOCK_API);
+
       const response = await fetch('/api/country'); // 假设这是你的后端API地址
       if (!response.ok) {
         throw new Error(`后端API请求失败，状态码: ${response.status}`);
