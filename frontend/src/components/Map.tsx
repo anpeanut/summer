@@ -4,7 +4,7 @@ import L, { Map as LeafletMap, GeoJSON as LeafletGeoJSON, Layer } from 'leaflet'
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-import { CountryData } from '../services/countryService';
+import { CountryData } from '../types'; // 修正导入路径
 
 
 // Leaflet 的一个已知问题，需要手动修复其默认图标的路径

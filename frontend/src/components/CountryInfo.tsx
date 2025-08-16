@@ -1,15 +1,15 @@
 import React from 'react';
-import { Card, CardContent, Typography, CardActions, Button } from '@mui/material';
-import { CountryDataExtended } from '../types'; // 使用扩展类型
+import { Card, CardContent, Typography, CardActions, Button, Alert } from '@mui/material';
+import { CountryData, Metadata } from '../types'; // 1. 导入新的 v2.0 类型
 
 type CountryInfoProps = {
-  data: CountryDataExtended | null;
-  onGenerateStory: () => void; // "开启人生故事"按钮的回调函数
-  isStoryLoading: boolean;     // 故事是否正在加载
+  data: CountryData | null;
+  metadata: Metadata | null; // 2. 接收 metadata
+  onGenerateStory: () => void;
+  isStoryLoading: boolean;
 };
 
-function CountryInfo({ data, onGenerateStory, isStoryLoading }: CountryInfoProps) {
-  // 如果还没有“投胎”，显示欢迎信息
+function CountryInfo({ data, metadata, onGenerateStory, isStoryLoading }: CountryInfoProps) {
   if (!data) {
     return (
       <Card sx={{ minWidth: 275, mb: 2 }}>
@@ -18,14 +18,19 @@ function CountryInfo({ data, onGenerateStory, isStoryLoading }: CountryInfoProps
             欢迎来到人生重开模拟器
           </Typography>
           <Typography variant="h6">
-            点击下方按钮，开始你的新人生
+            点击按钮，开始你的新人生
           </Typography>
         </CardContent>
       </Card>
     );
   }
 
-  // 如果已经“投胎”，显示国家信息和“开启人生”按钮
+  // 3. 从新的数据结构中安全地提取信息
+  const gdp = data.storySeed?.environment?.gdp_per_capita;
+  const industries = data.storySeed?.environment?.main_industries;
+  const lifeExpectancy = data.storySeed?.milestones?.life_expectancy;
+  const showCompletenessWarning = metadata?.dataCompleteness != null && metadata.dataCompleteness < 0.6;
+
   return (
     <Card sx={{ minWidth: 275, mb: 2 }}>
       <CardContent>
@@ -38,22 +43,38 @@ function CountryInfo({ data, onGenerateStory, isStoryLoading }: CountryInfoProps
         <Typography variant="body2">
           人口: {data.population.toLocaleString()}
         </Typography>
-        <Typography variant="body2">
-          人均GDP: ${data.gdpPerCapita.toLocaleString()}
-        </Typography>
-        <Typography variant="body2">
-          主要产业: {data.mainIndustries.join(', ')}
-        </Typography>
+        {gdp && (
+          <Typography variant="body2">
+            人均GDP: ${gdp.toLocaleString()}
+          </Typography>
+        )}
+        {industries && industries.length > 0 && (
+          <Typography variant="body2">
+            主要产业: {industries.join(', ')}
+          </Typography>
+        )}
+        {lifeExpectancy && (
+          <Typography variant="body2">
+            预期寿命: {lifeExpectancy} 岁
+          </Typography>
+        )}
       </CardContent>
-      <CardActions>
+      <CardActions sx={{ flexDirection: 'column', alignItems: 'flex-start', px: 2, pb: 2 }}>
         <Button 
           variant="contained" 
           color="secondary" 
           onClick={onGenerateStory}
           disabled={isStoryLoading}
+          fullWidth // 让按钮撑满卡片宽度
         >
           {isStoryLoading ? '正在生成...' : '开启我的人生故事'}
         </Button>
+        {/* 4. 根据数据完整度显示警告 */}
+        {showCompletenessWarning && (
+          <Alert severity="warning" sx={{ mt: 1.5, width: '100%', boxSizing: 'border-box' }}>
+            部分数据缺失，故事生成可能不够精确。
+          </Alert>
+        )}
       </CardActions>
     </Card>
   );

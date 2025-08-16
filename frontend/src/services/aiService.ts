@@ -1,46 +1,61 @@
-import { CountryDataExtended, LifeEvent } from '../types';
+import { CountryData, LifeEvent } from '../types';
 
 /**
  * 通过调用AI API生成人生故事。
- * @param countryData - 用于生成故事的扩展国家数据。
+ * @param countryData - 用于生成故事的国家数据 (v2.0)
  * @returns 返回一个包含人生事件数组的Promise。
  */
-export const generateLifeStory = async (countryData: CountryDataExtended): Promise<LifeEvent[]> => {
+export const generateLifeStory = async (countryData: CountryData): Promise<LifeEvent[]> => {
   const apiKey = process.env.REACT_APP_SILICONFLOW_API_KEY;
   const apiEndpoint = process.env.REACT_APP_SILICONFLOW_ENDPOINT;
 
-  // 检查API密钥和地址是否已在.env文件中配置
   if (!apiKey || !apiEndpoint) {
     console.error("AI API密钥或端点未在.env文件中正确配置。");
-    // 在未配置API时，直接返回模拟数据，避免应用崩溃
     return generateMockLifeStory();
   }
 
-  // 1. 设计提示词 (Prompt)
-  const prompt = `
-    你是一个人生故事生成器。请根据以下关于【${countryData.name}】的数据，
-    为一个出生于1990年的人，生成一个符合该国国情的、简短的人生故事。
-    
-    国家信息:
-    - 人均GDP (美元): ${countryData.gdpPerCapita}
-    - 主流教育水平: ${countryData.educationLevel}
-    - 主要产业: ${countryData.mainIndustries.join(', ')}
-    - 文化关键词: ${countryData.culturalKeywords.join(', ')}
+  const prompt = `### 角色扮演
+你是一位富有创造力的故事叙述者和世界级的游戏设计师，专精于为年轻人（1995-2005年出生）创作引人入胜、充满网络梗和时代印记的文本类人生模拟游戏。
 
-    故事应包含8到12个独立的人生事件。
-    输出结果必须是一个纯粹的、不包含任何其他文本或解释的、格式正确的JSON数组。
-    数组中的每个对象都必须严格遵循以下TypeScript接口定义:
-    interface LifeEvent {
-      year: number;       // 事件发生的年份
-      age: number;        // 当事人当时的年龄
-      event: string;      // 三到四句话的事件描述,尽量有趣
-      category: 'Education' | 'Career' | 'Relationship' | 'Milestone' | 'WorldEvent' | 'Special'; // 事件分类, 'Special' 用于隐藏主线
-    }
+### 核心任务
+根据下方提供的【${countryData.name}】国家数据，为一名出生于 **1995年到2005年** 的虚构角色，生成一段从童年到未来到死亡的、充满趣味和可能性的精彩人生故事。
 
-    请直接返回JSON数组，不要包含任何解释性文字。
-  `;
+### 数据锚点 (StorySeed)
+这是指导故事走向的真实世界数据。请将这些数据作为**统计学上的锚点**，来影响主角人生的关键决策和概率。
 
-  // 2. 调用AI API
+\`\`\`json
+${JSON.stringify(countryData.storySeed, null, 2)}
+\`\`\`
+
+**数据使用规则:**
+1.  **数据存在时**: 严格参考数据。例如，如果 \`university_rate\` 是 \`0.42\`，那么主角上大学的概率就应该是中等偏下。如果 \`main_industries\` 包含 "IT服务"，那么主角从事相关职业的可能性就更高。
+2.  **数据缺失时 (\`null\` 或字段不存在)**: 这是你发挥创造力的时刻！**你必须利用你对世界的广泛认知，为【${countryData.name}】做出合理且有趣的推断**。例如，如果 \`historicalEvents\` 为空，你可以自行加入全球青年熟知的事件，如智能手机的普及、社交媒体的兴起、某款现象级游戏（如《原神》）的发布、或是ChatGPT的诞生。
+
+### 故事风格与要求
+- **时代感与趣味性**: 故事必须有强烈的时代感，巧妙地融入全球性的流行文化、网络梗、科技变革和社会事件。不要写成干巴巴的流水账。
+- **共鸣**: 聚焦普通人的生活体验：尴尬的学生时代、第一份工作的迷茫、经营人际关系、面对社会热点事件的反应等。
+- **惊喜感 (隐藏主线)**: 有 **5%** 的概率，故事会偏离正常轨道，触发一条**“隐藏主线”**。这应该是一个意想不到的、充满想象力的转折。例如：
+    - 发现自己拥有某种不为人知的超能力（例如，能和猫说话）。
+    - 卷入某个大事件
+    - 欧气爆表玩游戏崩坏星穹铁道白厄卡池十连七金直接满命白厄，自此成了二游史上最欧的玩家。每一个人抽卡前都要拜你的画像，逝世100年后直接性转进卡池强度爆表。
+    当触发隐藏主线时，后续事件应围绕这条主线展开。
+
+### 输出格式 (严格要求)
+你 **必须** 返回一个纯粹的、不包含任何解释性文字或Markdown标记 (如 \`\`\`json) 的、格式完全正确的JSON数组。数组中的每个对象都必须严格遵循以下TypeScript接口定义：
+
+\`\`\`typescript
+interface LifeEvent {
+  year: number;       // 事件发生的年份
+  age: number;        // 当事人当时的年龄
+  event: string;      // 60字的生动事件描述
+  category: 'Education' | 'Career' | 'Relationship' | 'Milestone' | 'WorldEvent' | 'Special'; // 事件分类, 'Special' 用于隐藏主线
+  imgPrompt?: string; // (可选) 为这个事件生成一张配图的AI绘画提示词，风格：动漫，赛璐璐
+}
+\`\`\`
+
+**现在，请开始生成故事。**
+`;
+
   try {
     const response = await fetch(apiEndpoint, {
       method: 'POST',
@@ -49,11 +64,11 @@ export const generateLifeStory = async (countryData: CountryDataExtended): Promi
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "Qwen/Qwen2.5-72B-Instruct", 
-        //model: "deepseek-ai/DeepSeek-R1", // 使用文档中明确提到的模型
+        model: "deepseek-ai/DeepSeek-R1",
         messages: [{ role: "user", content: prompt }],
-        max_tokens: 8192, // 适当增加最大token数，以防JSON被截断
-        stream: false, // 明确要求非流式输出
+         response_format: { type: "json_object" }, // 明确要求JSON格式
+        max_tokens: 20000,
+        stream: false,
       })
     });
 
@@ -63,21 +78,54 @@ export const generateLifeStory = async (countryData: CountryDataExtended): Promi
     }
 
     const result = await response.json();
-    
-    // API返回的内容通常在 result.choices[0].message.content 中
-    // 它可能是一个字符串化的JSON，所以需要解析
-    const content = result.choices[0].message.content;
-    const storyEvents: LifeEvent[] = JSON.parse(content);
-
+    let content = result.choices[0].message.content;
+    // 增强的JSON清理和解析
+    const storyEvents = parseAIResponse(content);
     return storyEvents;
+
 
   } catch (error) {
     console.error("生成人生故事时发生错误:", error);
-    // 如果真实API调用失败，则降级使用模拟数据
     return generateMockLifeStory();
   }
 };
-
+// 新增：健壮的响应解析器
+function parseAIResponse(rawContent: string): LifeEvent[] {
+  try {
+    // 尝试直接解析
+    return JSON.parse(rawContent);
+  } catch (e) {
+    // 第一步清理：移除代码块标记
+    let cleaned = rawContent
+      .replace(/```(json)?/g, '')
+      .replace(/^[\s\S]*?($$|\{)/, '$1') // 替代/s标志的方案
+      .replace(/($$|\})[\s\S]*?$/, '$1')
+      .trim();
+    
+    // 第二步：修复常见格式问题
+    cleaned = cleaned
+      .replace(/(\w+):/g, '"$1":') // 为未加引号的key添加引号
+      .replace(/'/g, '"') // 单引号转双引号
+      .replace(/,\s*([}\]])/g, '$1'); // 移除尾部多余逗号
+    
+    try {
+      return JSON.parse(cleaned);
+    } catch (finalError) {
+      // 第三步：尝试提取有效JSON部分
+      const jsonMatch = cleaned.match(/(\[[\s\S]*?\])|(\{[\s\S]*?\})/);
+      if (jsonMatch) {
+        try {
+          return JSON.parse(jsonMatch[0]);
+        } catch {
+          // 最终回退：记录错误并返回模拟数据
+          console.error("无法解析的API响应:", cleaned.substring(0, 200));
+          throw new Error("API响应格式无效");
+        }
+      }
+      throw finalError;
+    }
+  }
+}
 /**
  * 提供一个模拟的人生故事，用于开发和测试。
  * 这在UI开发或API出问题时非常有用。

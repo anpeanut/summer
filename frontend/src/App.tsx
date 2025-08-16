@@ -6,12 +6,14 @@ import FetchButton from './components/FetchButton';
 import LifeStoryTimeline from './components/LifeStoryTimeline';
 import { fetchCountryData } from './services/countryService';
 import { generateLifeStory } from './services/aiService';
-import { CountryDataExtended, LifeEvent } from './types';
+import { CountryData, LifeEvent, Metadata } from './types'; // 1. 导入新的类型
 import './App.css';
 
 function App() {
   // 当前“投胎”到的国家数据
-  const [countryData, setCountryData] = useState<CountryDataExtended | null>(null);
+  const [countryData, setCountryData] = useState<CountryData | null>(null);
+  // 新增：国家数据的元数据
+  const [metadata, setMetadata] = useState<Metadata | null>(null);
   // AI生成的人生故事事件
   const [lifeStory, setLifeStory] = useState<LifeEvent[] | null>(null);
   // “投胎”按钮的加载状态
@@ -24,8 +26,9 @@ function App() {
     setIsCountryLoading(true);
     setLifeStory(null); // 清空上一次的人生故事
     try {
-      const data = await fetchCountryData();
-      setCountryData(data);
+      const response = await fetchCountryData();
+      setCountryData(response.data);
+      setMetadata(response.metadata);
     } catch (error) {
       console.error("获取国家数据失败:", error);
     } finally {
@@ -40,6 +43,7 @@ function App() {
     setIsStoryLoading(true);
     try {
       // 调用真实AI接口。如果AI服务或密钥配置有问题，该函数内部会降级到模拟数据。
+      // @ts-ignore // TODO: aiService aill be updated later to accept the new CountryData type
       const events = await generateLifeStory(countryData);
       setLifeStory(events);
     } catch (error) {
@@ -59,7 +63,8 @@ function App() {
           <div className="sidebar-header">
 
             <CountryInfo 
-              data={countryData} 
+              data={countryData}
+              metadata={metadata}
               onGenerateStory={handleGenerateStory}
               isStoryLoading={isStoryLoading}
             />
