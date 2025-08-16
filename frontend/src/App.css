@@ -4,11 +4,19 @@ body {
   font-family: sans-serif;
 }
 
-/* 这是最外层的大容器 */
+/* 新增：真正的最外层容器 */
+.root-container {
+  display: flex;
+  flex-direction: column; /* 垂直排列：Header在上，app-container在下 */
+  height: 100vh;
+}
+
+/* 这是中间内容区域的容器 */
 .app-container {
   display: flex; /* 关键！启用Flexbox布局 */
   flex-direction: row; /* 内部元素横向排列 */
-  height: 100vh; /* 高度占满整个浏览器窗口 */
+  flex-grow: 1; /* 占据剩余的所有垂直空间 */
+  overflow: hidden; /* 防止内部内容溢出导致整个页面滚动 */
 }
 
 /* 左侧的地图区域 */
@@ -19,12 +27,17 @@ body {
 
 /* 右侧的侧边栏 */
 .sidebar {
-  width: 400px; /* 将宽度调整为400px以容纳时间轴 */
+  width: 500px; /* 将宽度调整为450px，为时间轴提供更舒适的空间 */
   padding: 16px; /* 内部留出一些边距，让内容不贴边 */
   box-sizing: border-box; /* 确保内边距不会增加盒子的总宽度 */
   display: flex;
   flex-direction: column; /* 侧边栏内部的元素（信息和按钮）是纵向排列的 */
-  height: 100vh; /* 关键：让侧边栏高度占满整个视窗 */
+  /* 移除固定的高度，让flex子元素自己决定高度 */
+}
+
+/* 新增：侧边栏的头部，包含按钮和国家信息 */
+.sidebar-header {
+  flex-shrink: 0; /* 防止头部区域被压缩 */
 }
 
 /* 按钮的基本样式 */

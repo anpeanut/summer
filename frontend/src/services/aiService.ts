@@ -33,8 +33,8 @@ export const generateLifeStory = async (countryData: CountryDataExtended): Promi
     interface LifeEvent {
       year: number;       // 事件发生的年份
       age: number;        // 当事人当时的年龄
-      event: string;      // 一到两句话的事件描述
-      category: 'Education' | 'Career' | 'Family' | 'Milestone' | 'Generic'; // 事件分类
+      event: string;      // 三到四句话的事件描述,尽量有趣
+      category: 'Education' | 'Career' | 'Relationship' | 'Milestone' | 'WorldEvent' | 'Special'; // 事件分类, 'Special' 用于隐藏主线
     }
 
     请直接返回JSON数组，不要包含任何解释性文字。
@@ -49,9 +49,10 @@ export const generateLifeStory = async (countryData: CountryDataExtended): Promi
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "Qwen/Qwen2.5-72B-Instruct", // 使用文档中明确提到的模型
+        model: "Qwen/Qwen2.5-72B-Instruct", 
+        //model: "deepseek-ai/DeepSeek-R1", // 使用文档中明确提到的模型
         messages: [{ role: "user", content: prompt }],
-        max_tokens: 2048, // 适当增加最大token数，以防JSON被截断
+        max_tokens: 8192, // 适当增加最大token数，以防JSON被截断
         stream: false, // 明确要求非流式输出
       })
     });
@@ -91,8 +92,8 @@ export const generateMockLifeStory = async (): Promise<LifeEvent[]> => {
         { year: 2008, age: 18, event: "参加了激烈的高考，并考入了一所不错的大学，学习计算机科学。", category: 'Education' },
         { year: 2012, age: 22, event: "大学毕业，在一家迅速发展的电子商务公司找到了第一份工作。", category: 'Career' },
         { year: 2016, age: 26, event: "经过几年的努力，晋升为项目小组长，并负责一个小团队。", category: 'Career' },
-        { year: 2018, age: 28, event: "与相爱多年的伴侣结婚，组建了自己的小家庭。", category: 'Family' },
+        { year: 2018, age: 28, event: "与相爱多年的伴侣结婚，组建了自己的小家庭。", category: 'Relationship' },
         { year: 2021, age: 31, event: "在工作的城市里，通过努力贷款购买了第一套房子。", category: 'Milestone' },
-        { year: 2023, age: 33, event: "孩子出生了，生活进入了一个全新的、充满挑战和喜悦的阶段。", category: 'Family' },
+        { year: 2023, age: 33, event: "孩子出生了，生活进入了一个全新的、充满挑战和喜悦的阶段。", category: 'Relationship' },
     ];
 }

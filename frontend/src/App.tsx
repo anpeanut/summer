@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Header from './components/Header'; // 1. 导入Header组件
 import Map from './components/Map';
 import CountryInfo from './components/CountryInfo';
 import FetchButton from './components/FetchButton';
@@ -49,22 +50,31 @@ function App() {
   };
 
   return (
-    <div className="app-container">
-      <div className="sidebar">
-        <FetchButton 
-          onClick={handleReincarnate} 
-          isLoading={isCountryLoading} 
-          text="开始投胎"
-        />
-        <CountryInfo 
-          data={countryData} 
-          onGenerateStory={handleGenerateStory}
-          isStoryLoading={isStoryLoading}
-        />
-        <LifeStoryTimeline events={lifeStory} isLoading={isStoryLoading} />
-      </div>
-      <div className="map-area">
-        <Map data={countryData} />
+    // 2. 创建一个新的根容器
+    <div className="root-container"> 
+      <Header />
+      <div className="app-container">
+        <div className="sidebar">
+          {/* -- 1. 将头部信息包裹在一个 div 中 -- */}
+          <div className="sidebar-header">
+
+            <CountryInfo 
+              data={countryData} 
+              onGenerateStory={handleGenerateStory}
+              isStoryLoading={isStoryLoading}
+            />
+              <FetchButton 
+              onClick={handleReincarnate} 
+              isLoading={isCountryLoading} 
+              text="开始投胎"
+            />
+          </div>
+          {/* -- 2. 时间线组件现在是独立的，可以拥有自己的滚动条 -- */}
+          <LifeStoryTimeline events={lifeStory} isLoading={isStoryLoading} />
+        </div>
+        <div className="map-area">
+          <Map data={countryData} />
+        </div>
       </div>
     </div>
   );

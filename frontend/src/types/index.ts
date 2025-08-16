@@ -23,6 +23,6 @@ export interface LifeEvent {
   year: number;
   age: number;
   event: string;
-  category: 'Education' | 'Career' | 'Family' | 'Milestone' | 'Generic';
+  category: 'Education' | 'Career' | 'Relationship' | 'Milestone' | 'WorldEvent' | 'Special'; // 事件分类, 'Special' 用于隐藏主线
   imgPrompt?: string; // Reserved for future image generation
 }
