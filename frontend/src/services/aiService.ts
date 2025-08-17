@@ -76,9 +76,9 @@ export const generateLifeStory = async (
         'Authorization': `Bearer ${config.apiKey}`
       },
       body: JSON.stringify({
-        model: "deepseek-ai/DeepSeek-V3",
+        model: "deepseek-ai/DeepSeek-V3", // 使用V3模型
         messages: [{ role: "user", content: prompt }],
-        max_tokens: 20000,
+        max_tokens: 4096, // 限制最大token
         stream: true,
       })
     });
@@ -95,7 +95,8 @@ export const generateLifeStory = async (
     // 处理流式响应
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
-    let buffer = '';
+    let sseBuffer = '';
+    let contentBuffer = '';
 
     while (true) {
       const { done, value } = await reader.read();
@@ -103,15 +104,37 @@ export const generateLifeStory = async (
         break;
       }
       
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || ''; // 保留下次循环处理的不完整行
+      sseBuffer += decoder.decode(value, { stream: true });
+      const sseLines = sseBuffer.split('\n');
+      sseBuffer = sseLines.pop() || ''; // 保留不完整的SSE行
 
-      for (const line of lines) {
-        if (line.trim()) { // 忽略空行
-          const event = parseNdjsonLine(line);
-          if (event) {
-            onEventReceived(event);
+      for (const sseLine of sseLines) {
+        if (sseLine.startsWith('data: ')) {
+          const data = sseLine.substring(6);
+          if (data.trim() === '[DONE]') {
+            break;
+          }
+          try {
+            const parsed = JSON.parse(data);
+            const deltaContent = parsed.choices[0]?.delta?.content;
+            if (deltaContent) {
+              contentBuffer += deltaContent;
+              
+              // 检查内容缓冲区中是否有完整的NDJSON行
+              const contentLines = contentBuffer.split('\n');
+              contentBuffer = contentLines.pop() || ''; // 保留不完整的JSON行
+
+              for (const contentLine of contentLines) {
+                if (contentLine.trim()) {
+                  const event = parseNdjsonLine(contentLine);
+                  if (event) {
+                    onEventReceived(event);
+                  }
+                }
+              }
+            }
+          } catch (e) {
+            // 忽略单个SSE块的解析错误
           }
         }
       }

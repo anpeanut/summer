@@ -47,16 +47,19 @@ interface LifeEvent {
   age: number;        // 当事人当时的年龄
   event: string;      // 60字的生动事件描述
   category: 'Education' | 'Career' | 'Relationship' | 'Milestone' | 'WorldEvent' | 'Special'; // 事件分类, 'Special' 用于隐藏主线
-  imgPrompt?: string; // (可选) 为这个事件生成一张配图的AI绘画提示词，风格：动漫，赛璐璐
+  
 }
 \`\`\`
 
-**示例输出:**
-{"year": 1998, "age": 3, "event": "...", "category": "Milestone"}
-{"year": 2001, "age": 6, "event": "...", "category": "Education"}
-{"year": 2014, "age": 19, "event": "...", "category": "Education", "imgPrompt": "..."}
+**高质量输出范例说明：**
+以下是三行独立的JSON输出。请注意，在你的实际输出中，每一行JSON的末尾都必须紧跟一个\`\\n\`换行符。
+
+{"year":1998,"age":3,"event":"你出生在[城市]，一个普通的工薪家庭。你的父亲是一名工程师，母亲是教师，他们对你的降生充满期待。","category":"Milestone"}
+{"year":2004,"age":9,"event":"你第一次接触到了互联网，在老旧的电脑上玩着Flash小游戏，那是你数字世界的启蒙。","category":"WorldEvent","imgPrompt":"一个孩子在老式电脑前玩游戏，屏幕发着光，动漫风格"}
+{"year":2013,"age":18,"event":"你奋力拼搏，考上了一所不错的大学，选择了热门的计算机科学专业，对未来充满憧憬。","category":"Education"}
+
+**绝对规则：** 你的回答**必须**只包含JSON对象，每行一个。每个JSON对象都必须以一个换行符\`\\n\`结束。严禁在任何JSON对象前后或之间添加任何注释、解释、Markdown标记或其他任何非JSON字符。
 
 **现在，请开始生成故事。**
 `;
-;
 };

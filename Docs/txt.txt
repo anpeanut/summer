@@ -1,0 +1,238 @@
+data: {"choices":[{"index":0,"delta":{"content":"","reasoning_content":null,"role":"assistant"},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":0,"total_tokens":1334}}
+
+data: {"choices":[{"index":0,"delta":{"content":"{\"","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":1,"total_tokens":1335}}
+
+data: {"choices":[{"index":0,"delta":{"content":"year","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":2,"total_tokens":1336}}
+
+data: {"choices":[{"index":0,"delta":{"content":"\": ","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":4,"total_tokens":1338}}
+
+data: {"choices":[{"index":0,"delta":{"content":"2000","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":6,"total_tokens":1340}}
+
+data: {"choices":[{"index":0,"delta":{"content":", \"","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":8,"total_tokens":1342}}
+
+data: {"choices":[{"index":0,"delta":{"content":"age\":","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":10,"total_tokens":1344}}
+
+data: {"choices":[{"index":0,"delta":{"content":" 0","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":12,"total_tokens":1346}}
+
+data: {"choices":[{"index":0,"delta":{"content":", \"","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":14,"total_tokens":1348}}
+
+data: {"choices":[{"index":0,"delta":{"content":"event\":","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":16,"total_tokens":1350}}
+
+data: {"choices":[{"index":0,"delta":{"content":" \"你","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":18,"total_tokens":1352}}
+
+data: {"choices":[{"index":0,"delta":{"content":"出生在中国","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":20,"total_tokens":1354}}
+
+data: {"choices":[{"index":0,"delta":{"content":"的一个","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":21,"total_tokens":1355}}
+
+data: {"choices":[{"index":0,"delta":{"content":"中等","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":22,"total_tokens":1356}}
+
+data: {"choices":[{"index":0,"delta":{"content":"城市，","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":24,"total_tokens":1358}}
+
+data: {"choices":[{"index":0,"delta":{"content":"父母","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":25,"total_tokens":1359}}
+
+data: {"choices":[{"index":0,"delta":{"content":"给你取名","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":27,"total_tokens":1361}}
+
+data: {"choices":[{"index":0,"delta":{"content":"李明","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":28,"total_tokens":1362}}
+
+data: {"choices":[{"index":0,"delta":{"content":"，","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":29,"total_tokens":1363}}
+
+data: {"choices":[{"index":0,"delta":{"content":"是个","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":30,"total_tokens":1364}}
+
+data: {"choices":[{"index":0,"delta":{"content":"男孩。","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":32,"total_tokens":1366}}
+
+data: {"choices":[{"index":0,"delta":{"content":"你的父亲","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":34,"total_tokens":1368}}
+
+data: {"choices":[{"index":0,"delta":{"content":"是一名电子商务","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":36,"total_tokens":1370}}
+
+data: {"choices":[{"index":0,"delta":{"content":"公司的","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":37,"total_tokens":1371}}
+
+data: {"choices":[{"index":0,"delta":{"content":"普通职员","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":39,"total_tokens":1373}}
+
+data: {"choices":[{"index":0,"delta":{"content":"，母亲","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":41,"total_tokens":1375}}
+
+data: {"choices":[{"index":0,"delta":{"content":"是一位","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":42,"total_tokens":1376}}
+
+data: {"choices":[{"index":0,"delta":{"content":"小学老师","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":44,"total_tokens":1378}}
+
+data: {"choices":[{"index":0,"delta":{"content":"，","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":45,"total_tokens":1379}}
+
+data: {"choices":[{"index":0,"delta":{"content":"家庭虽","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":47,"total_tokens":1381}}
+
+data: {"choices":[{"index":0,"delta":{"content":"不富裕","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":49,"total_tokens":1383}}
+
+data: {"choices":[{"index":0,"delta":{"content":"但温馨","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":51,"total_tokens":1385}}
+
+data: {"choices":[{"index":0,"delta":{"content":"。","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":52,"total_tokens":1386}}
+
+data: {"choices":[{"index":0,"delta":{"content":"\", \"","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":54,"total_tokens":1388}}
+
+data: {"choices":[{"index":0,"delta":{"content":"category\":","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":56,"total_tokens":1390}}
+
+data: {"choices":[{"index":0,"delta":{"content":" \"Mil","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":58,"total_tokens":1392}}
+
+data: {"choices":[{"index":0,"delta":{"content":"estone\"}\n","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":60,"total_tokens":1394}}
+
+data: {"choices":[{"index":0,"delta":{"content":"{\"year","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":62,"total_tokens":1396}}
+
+data: {"choices":[{"index":0,"delta":{"content":"\": ","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":64,"total_tokens":1398}}
+
+data: {"choices":[{"index":0,"delta":{"content":"2003","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":66,"total_tokens":1400}}
+
+data: {"choices":[{"index":0,"delta":{"content":", \"","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":68,"total_tokens":1402}}
+
+data: {"choices":[{"index":0,"delta":{"content":"age\":","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":70,"total_tokens":1404}}
+
+data: {"choices":[{"index":0,"delta":{"content":" 3","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":72,"total_tokens":1406}}
+
+data: {"choices":[{"index":0,"delta":{"content":", \"","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":74,"total_tokens":1408}}
+
+data: {"choices":[{"index":0,"delta":{"content":"event\":","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":76,"total_tokens":1410}}
+
+data: {"choices":[{"index":0,"delta":{"content":" \"你","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":78,"total_tokens":1412}}
+
+data: {"choices":[{"index":0,"delta":{"content":"开始上","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":80,"total_tokens":1414}}
+
+data: {"choices":[{"index":0,"delta":{"content":"幼儿园，","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":82,"total_tokens":1416}}
+
+data: {"choices":[{"index":0,"delta":{"content":"特别喜欢","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":83,"total_tokens":1417}}
+
+data: {"choices":[{"index":0,"delta":{"content":"听","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":84,"total_tokens":1418}}
+
+data: {"choices":[{"index":0,"delta":{"content":"老师","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":85,"total_tokens":1419}}
+
+data: {"choices":[{"index":0,"delta":{"content":"讲故事，","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":87,"total_tokens":1421}}
+
+data: {"choices":[{"index":0,"delta":{"content":"每天都","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":88,"total_tokens":1422}}
+
+data: {"choices":[{"index":0,"delta":{"content":"缠着","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":90,"total_tokens":1424}}
+
+data: {"choices":[{"index":0,"delta":{"content":"妈妈","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":91,"total_tokens":1425}}
+
+data: {"choices":[{"index":0,"delta":{"content":"讲睡前","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":93,"total_tokens":1427}}
+
+data: {"choices":[{"index":0,"delta":{"content":"故事，","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":95,"total_tokens":1429}}
+
+data: {"choices":[{"index":0,"delta":{"content":"梦想","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":96,"total_tokens":1430}}
+
+data: {"choices":[{"index":0,"delta":{"content":"着自己","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":97,"total_tokens":1431}}
+
+data: {"choices":[{"index":0,"delta":{"content":"有一天也能","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":99,"total_tokens":1433}}
+
+data: {"choices":[{"index":0,"delta":{"content":"成为故事","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":101,"total_tokens":1435}}
+
+data: {"choices":[{"index":0,"delta":{"content":"里的英雄","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":103,"total_tokens":1437}}
+
+data: {"choices":[{"index":0,"delta":{"content":"。\",","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":105,"total_tokens":1439}}
+
+data: {"choices":[{"index":0,"delta":{"content":" \"category","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":107,"total_tokens":1441}}
+
+data: {"choices":[{"index":0,"delta":{"content":"\": \"","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":109,"total_tokens":1443}}
+
+data: {"choices":[{"index":0,"delta":{"content":"Education\"}\n","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":111,"total_tokens":1445}}
+
+data: {"choices":[{"index":0,"delta":{"content":"{\"year","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":113,"total_tokens":1447}}
+
+data: {"choices":[{"index":0,"delta":{"content":"\": ","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":115,"total_tokens":1449}}
+
+data: {"choices":[{"index":0,"delta":{"content":"2008","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":117,"total_tokens":1451}}
+
+data: {"choices":[{"index":0,"delta":{"content":", \"","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":119,"total_tokens":1453}}
+
+data: {"choices":[{"index":0,"delta":{"content":"age\":","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":121,"total_tokens":1455}}
+
+data: {"choices":[{"index":0,"delta":{"content":" 8","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":123,"total_tokens":1457}}
+
+data: {"choices":[{"index":0,"delta":{"content":", \"","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":125,"total_tokens":1459}}
+
+data: {"choices":[{"index":0,"delta":{"content":"event\":","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":127,"total_tokens":1461}}
+
+data: {"choices":[{"index":0,"delta":{"content":" \"北京","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":129,"total_tokens":1463}}
+
+data: {"choices":[{"index":0,"delta":{"content":"奥运会举办","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":131,"total_tokens":1465}}
+
+data: {"choices":[{"index":0,"delta":{"content":"期间","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":132,"total_tokens":1466}}
+
+data: {"choices":[{"index":0,"delta":{"content":"，你和","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":134,"total_tokens":1468}}
+
+data: {"choices":[{"index":0,"delta":{"content":"全","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":135,"total_tokens":1469}}
+
+data: {"choices":[{"index":0,"delta":{"content":"家人一起","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":137,"total_tokens":1471}}
+
+data: {"choices":[{"index":0,"delta":{"content":"在","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":138,"total_tokens":1472}}
+
+data: {"choices":[{"index":0,"delta":{"content":"电视机前","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":140,"total_tokens":1474}}
+
+data: {"choices":[{"index":0,"delta":{"content":"为中国队","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":142,"total_tokens":1476}}
+
+data: {"choices":[{"index":0,"delta":{"content":"加油，","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":144,"total_tokens":1478}}
+
+data: {"choices":[{"index":0,"delta":{"content":"特别崇拜","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":146,"total_tokens":1480}}
+
+data: {"choices":[{"index":0,"delta":{"content":"刘","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":147,"total_tokens":1481}}
+
+data: {"choices":[{"index":0,"delta":{"content":"翔，","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":149,"total_tokens":1483}}
+
+data: {"choices":[{"index":0,"delta":{"content":"虽然","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":150,"total_tokens":1484}}
+
+data: {"choices":[{"index":0,"delta":{"content":"他在","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":151,"total_tokens":1485}}
+
+data: {"choices":[{"index":0,"delta":{"content":"比赛中因","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":153,"total_tokens":1487}}
+
+data: {"choices":[{"index":0,"delta":{"content":"伤退","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":155,"total_tokens":1489}}
+
+data: {"choices":[{"index":0,"delta":{"content":"赛，","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":157,"total_tokens":1491}}
+
+data: {"choices":[{"index":0,"delta":{"content":"但","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":158,"total_tokens":1492}}
+
+data: {"choices":[{"index":0,"delta":{"content":"你对","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":159,"total_tokens":1493}}
+
+data: {"choices":[{"index":0,"delta":{"content":"体育","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":160,"total_tokens":1494}}
+
+data: {"choices":[{"index":0,"delta":{"content":"的热情","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":161,"total_tokens":1495}}
+
+data: {"choices":[{"index":0,"delta":{"content":"不减","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":162,"total_tokens":1496}}
+
+data: {"choices":[{"index":0,"delta":{"content":"反","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":163,"total_tokens":1497}}
+
+data: {"choices":[{"index":0,"delta":{"content":"增。","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":165,"total_tokens":1499}}
+
+data: {"choices":[{"index":0,"delta":{"content":"\", \"","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":167,"total_tokens":1501}}
+
+data: {"choices":[{"index":0,"delta":{"content":"category\":","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":169,"total_tokens":1503}}
+
+data: {"choices":[{"index":0,"delta":{"content":" \"World","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":171,"total_tokens":1505}}
+
+data: {"choices":[{"index":0,"delta":{"content":"Event\",","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":173,"total_tokens":1507}}
+
+data: {"choices":[{"index":0,"delta":{"content":" \"img","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":175,"total_tokens":1509}}
+
+data: {"choices":[{"index":0,"delta":{"content":"Prompt\":","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":177,"total_tokens":1511}}
+
+data: {"choices":[{"index":0,"delta":{"content":" \"一家","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":179,"total_tokens":1513}}
+
+data: {"choices":[{"index":0,"delta":{"content":"三口","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":180,"total_tokens":1514}}
+
+data: {"choices":[{"index":0,"delta":{"content":"在","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":181,"total_tokens":1515}}
+
+data: {"choices":[{"index":0,"delta":{"content":"电视机前","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":183,"total_tokens":1517}}
+
+data: {"choices":[{"index":0,"delta":{"content":"为中国队","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":185,"total_tokens":1519}}
+
+data: {"choices":[{"index":0,"delta":{"content":"加油，","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":187,"total_tokens":1521}}
+
+data: {"choices":[{"index":0,"delta":{"content":"背景","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":188,"total_tokens":1522}}
+
+data: {"choices":[{"index":0,"delta":{"content":"是奥运会","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":190,"total_tokens":1524}}
+
+data: {"choices":[{"index":0,"delta":{"content":"标志，","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":192,"total_tokens":1526}}
+
+data: {"choices":[{"index":0,"delta":{"content":"动漫风格","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":194,"total_tokens":1528}}
+
+data: {"choices":[{"index":0,"delta":{"content":"\"}\n{\"","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":196,"total_tokens":1530}}
+
+data: {"choices":[{"index":0,"delta":{"content":"year\":","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":198,"total_tokens":1532}}
+
+data: {"choices":[{"index":0,"delta":{"content":" 201","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":200,"total_tokens":1534}}
+
+data: {"choices":[{"index":0,"delta":{"content":"2,","reasoning_content":null},"finish_reason":null}],"system_fingerprint":"","usage":{"prompt_tokens":1334,"completion_tokens":202,"total_tokens":1536}}
+
