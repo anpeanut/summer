@@ -12,7 +12,7 @@ import './App.css';
 function App() {
   const [countryData, setCountryData] = useState<CountryData | null>(null);
   const [metadata, setMetadata] = useState<Metadata | null>(null);
-  const [lifeStory, setLifeStory] = useState<LifeEvent[]>([]); // Changed initial state to empty array
+  const [lifeStory, setLifeStory] = useState<LifeEvent[]>([]); 
   const [isCountryLoading, setIsCountryLoading] = useState(false);
   const [isStoryLoading, setIsStoryLoading] = useState(false);
   const [eventQueue, setEventQueue] = useState<LifeEvent[]>([]);

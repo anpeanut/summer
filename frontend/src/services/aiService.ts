@@ -1,4 +1,5 @@
 import { CountryData, LifeEvent, ApiKeyConfig } from '../types';
+import { getLifeStoryPrompt } from '../prompts/lifeStoryPrompt';
 
 /**
  * 动态获取AI服务的配置（API密钥和端点）。
@@ -64,57 +65,7 @@ export const generateLifeStory = async (
     return;
   }
 
-  const prompt = `### 角色扮演
-你是一位富有创造力的故事叙述者和世界级的游戏设计师，专精于为年轻人（1995-2005年出生）创作引人入胜、充满网络梗和时代印记的文本类人生模拟游戏。
-
-### 核心任务
-根据下方提供的【${countryData.name}】国家数据，为一名出生于 **1995年到2005年** 的虚构角色，生成一段从童年到未来到死亡的、充满趣味和可能性的精彩人生故事。
-
-### 数据锚点 (StorySeed)
-这是指导故事走向的真实世界数据。请将这些数据作为**统计学上的锚点**，来影响主角人生的关键决策和概率。
-
-\`\`\`json
-${JSON.stringify(countryData.storySeed, null, 2)}
-\`\`\`
-
-**数据使用规则:**
-1.  **数据存在时**: 严格参考数据。例如，如果 \`university_rate\` 是 \`0.42\`，那么主角上大学的概率就应该是中等偏下。如果 \`main_industries\` 包含 "IT服务"，那么主角从事相关职业的可能性就更高。
-2.  **数据缺失时 (\`null\` 或字段不存在)**: 这是你发挥创造力的时刻！**你必须利用你对世界的广泛认知，为【${countryData.name}】做出合理且有趣的推断**。例如，如果 \`historicalEvents\` 为空，你可以自行加入全球青年熟知的事件，如智能手机的普及、社交媒体的兴起、某款现象级游戏（如《原神》）的发布、或是ChatGPT的诞生。
-
-### 故事风格与要求
-- **时代感与趣味性**: 故事必须有强烈的时代感，巧妙地融入全球性的流行文化、网络梗、科技变革和社会事件。不要写成干巴巴的流水账。
-- **共鸣**: 聚焦普通人的生活体验：尴尬的学生时代、第一份工作的迷茫、经营人际关系、面对社会热点事件的反应等。
-- **惊喜感 (隐藏主线)**: 有 **5%** 的概率，故事会偏离正常轨道，触发一条**“隐藏主线”**。这应该是一个意想不到的、充满想象力的转折。例如：
-    - 发现自己拥有某种不为人知的超能力（例如，能和猫说话）。
-    - 卷入某个大事件
-    - 欧气爆表玩游戏崩坏星穹铁道白厄卡池十连七金直接满命白厄，自此成了二游史上最欧的玩家。每一个人抽卡前都要拜你的画像，逝世100年后直接性转进卡池强度爆表。
-    当触发隐藏主线时，后续事件应围绕这条主线展开。
-
-### 输出格式 (严格要求)
-你 **必须** 以 **换行符分隔的JSON (NDJSON)** 格式进行输出。
-- **不要** 使用JSON数组的 \`[\` 和 \`]\`。
-- 每生成一个人生事件对象，就立即将其作为**一行**输出，并以换行符 \`\\n\` 结尾。
-- 每个输出的行都必须是一个**完整且独立**的JSON对象。
-- **不要** 在对象之间添加逗号。
-- 输出的JSON对象必须严格遵循以下TypeScript接口定义：
-
-\`\`\`typescript
-interface LifeEvent {
-  year: number;       // 事件发生的年份
-  age: number;        // 当事人当时的年龄
-  event: string;      // 60字的生动事件描述
-  category: 'Education' | 'Career' | 'Relationship' | 'Milestone' | 'WorldEvent' | 'Special'; // 事件分类, 'Special' 用于隐藏主线
-  imgPrompt?: string; // (可选) 为这个事件生成一张配图的AI绘画提示词，风格：动漫，赛璐璐
-}
-\`\`\`
-
-**示例输出:**
-{"year": 1998, "age": 3, "event": "...", "category": "Milestone"}
-{"year": 2001, "age": 6, "event": "...", "category": "Education"}
-{"year": 2014, "age": 19, "event": "...", "category": "Education", "imgPrompt": "..."}
-
-**现在，请开始生成故事。**
-`;
+  const prompt = getLifeStoryPrompt(countryData);
 
   // 3. 调用AI API
   try {
@@ -125,9 +76,8 @@ interface LifeEvent {
         'Authorization': `Bearer ${config.apiKey}`
       },
       body: JSON.stringify({
-        model: "deepseek-ai/DeepSeek-R1",
+        model: "deepseek-ai/DeepSeek-V3",
         messages: [{ role: "user", content: prompt }],
-         response_format: { type: "json_object" }, // 明确要求JSON格式
         max_tokens: 20000,
         stream: true,
       })
@@ -146,7 +96,6 @@ interface LifeEvent {
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
-    let contentBuffer = ''; // Buffer for potentially fragmented JSON objects
 
     while (true) {
       const { done, value } = await reader.read();
@@ -155,42 +104,18 @@ interface LifeEvent {
       }
       
       buffer += decoder.decode(value, { stream: true });
-      
-      // The response is a Server-Sent Event (SSE) stream.
-      // We need to process it line by line.
       const lines = buffer.split('\n');
-      buffer = lines.pop() || ''; // Keep the last, possibly incomplete line.
+      buffer = lines.pop() || ''; // 保留下次循环处理的不完整行
 
       for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          const data = line.substring(6);
-          if (data.trim() === '[DONE]') {
-            // Stream finished
-            break;
-          }
-          try {
-            const parsed = JSON.parse(data);
-            const deltaContent = parsed.choices[0]?.delta?.content;
-            if (deltaContent) {
-              contentBuffer += deltaContent;
-              // Try to parse the buffered content
-              // This is a simple approach; a more robust one would handle nested objects.
-              try {
-                  const lifeEvent: LifeEvent = JSON.parse(contentBuffer);
-                  // If parsing succeeds, we have a complete object.
-                  onEventReceived(lifeEvent);
-                  contentBuffer = ''; // Reset buffer for the next object
-              } catch (e) {
-                  // JSON is not yet complete, continue accumulating.
-              }
-            }
-          } catch (e) {
-            // Ignore parsing errors for individual chunks
+        if (line.trim()) { // 忽略空行
+          const event = parseNdjsonLine(line);
+          if (event) {
+            onEventReceived(event);
           }
         }
       }
     }
-
   } catch (error) {
     console.error("生成人生故事时发生流式错误:", error);
     onError(error as Error);
@@ -198,6 +123,35 @@ interface LifeEvent {
     onComplete();
   }
 };
+
+/**
+ * 健壮的NDJSON行解析器。
+ * @param line - 从流中接收到的一行文本。
+ * @returns 如果解析成功，返回LifeEvent对象；否则返回null。
+ */
+function parseNdjsonLine(line: string): LifeEvent | null {
+  try {
+    // 尝试直接解析最干净的情况
+    return JSON.parse(line);
+  } catch (e) {
+    // 如果直接解析失败，尝试进行清理
+    // 1. 寻找被包裹的JSON对象
+    const jsonMatch = line.match(/\{.*\}/);
+    if (jsonMatch) {
+      try {
+        // 2. 尝试解析提取出的部分
+        return JSON.parse(jsonMatch[0]);
+      } catch (finalError) {
+        // 如果清理后仍然失败，则放弃这一行
+        console.warn("无法解析的流数据行:", line);
+        return null;
+      }
+    }
+    // 如果连花括号都找不到，基本可以确定不是有效数据
+    console.warn("已丢弃无效的流数据行:", line);
+    return null;
+  }
+}
 
 /**
  * 提供一个模拟的人生故事，用于开发和测试。
