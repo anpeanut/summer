@@ -76,13 +76,6 @@ function App() {
       () => {
         console.log(`[${new Date().toISOString()}] LOG: App.tsx - Stream has completed.`);
         streamCompletedRef.current = true;
-      
-        const queueCheckInterval = setInterval(() => {
-          if (eventQueueRef.current.length === 0) {
-            setIsStoryLoading(false);
-            clearInterval(queueCheckInterval);
-          }
-        }, 100);
       }
     );
   };
@@ -109,6 +102,9 @@ function App() {
             // 更新 state 以触发UI渲染
             setLifeStory(prevStory => [...prevStory, nextEvent]);
           }
+        } else if (streamCompletedRef.current) {
+          // 如果队列为空，并且数据流已结束，则停止加载并清除计时器
+          setIsStoryLoading(false);
         }
       }, 500); // 动画间隔
     }
