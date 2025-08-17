@@ -97,8 +97,8 @@ const mockMetadata: Metadata = {
  * 它会根据 .env 文件中的 REACT_APP_USE_MOCK_API 变量来决定是调用后端API还是使用本地模拟数据。
  */
 export const fetchCountryData = async (): Promise<CountryServiceResponse> => {
-  const useMock = process.env.REACT_APP_USE_MOCK_API === 'true';
-
+  //const useMock = process.env.REACT_APP_USE_MOCK_API === 'true';
+ const useMock =true
   if (useMock) {
     console.log("【模式】: 使用内置模拟数据 (countryService.ts)");
     await new Promise(resolve => setTimeout(resolve, 300));

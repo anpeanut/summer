@@ -1,15 +1,16 @@
 import React from 'react';
 import { Card, CardContent, Typography, CardActions, Button, Alert } from '@mui/material';
-import { CountryData, Metadata } from '../types'; // 1. 导入新的 v2.0 类型
+import { CountryData, Metadata, LifeEvent } from '../types'; // 1. 导入 LifeEvent
 
 type CountryInfoProps = {
   data: CountryData | null;
-  metadata: Metadata | null; // 2. 接收 metadata
+  metadata: Metadata | null;
   onGenerateStory: () => void;
   isStoryLoading: boolean;
+  lifeStory: LifeEvent[] | null; // 2. 接收 lifeStory prop
 };
 
-function CountryInfo({ data, metadata, onGenerateStory, isStoryLoading }: CountryInfoProps) {
+function CountryInfo({ data, metadata, onGenerateStory, isStoryLoading, lifeStory }: CountryInfoProps) {
   if (!data) {
     return (
       <Card sx={{ minWidth: 275, mb: 2 }}>
@@ -30,6 +31,19 @@ function CountryInfo({ data, metadata, onGenerateStory, isStoryLoading }: Countr
   const industries = data.storySeed?.environment?.main_industries;
   const lifeExpectancy = data.storySeed?.milestones?.life_expectancy;
   const showCompletenessWarning = metadata?.dataCompleteness != null && metadata.dataCompleteness < 0.6;
+
+  // 3. 动态计算按钮文本和状态
+  const getButtonState = () => {
+    if (lifeStory && lifeStory.length > 0) {
+      return { text: '重新生成你的人生故事', disabled: true };
+    }
+    if (isStoryLoading) {
+      return { text: '正在生成...', disabled: true };
+    }
+    return { text: '开启我的人生故事', disabled: false };
+  };
+
+  const { text: buttonText, disabled: isButtonDisabled } = getButtonState();
 
   return (
     <Card sx={{ minWidth: 275, mb: 2 }}>
@@ -64,12 +78,11 @@ function CountryInfo({ data, metadata, onGenerateStory, isStoryLoading }: Countr
           variant="contained" 
           color="secondary" 
           onClick={onGenerateStory}
-          disabled={isStoryLoading}
-          fullWidth // 让按钮撑满卡片宽度
+          disabled={isButtonDisabled} // 使用动态状态
+          fullWidth
         >
-          {isStoryLoading ? '正在生成...' : '开启我的人生故事'}
+          {buttonText} {/* 使用动态文本 */}
         </Button>
-        {/* 4. 根据数据完整度显示警告 */}
         {showCompletenessWarning && (
           <Alert severity="warning" sx={{ mt: 1.5, width: '100%', boxSizing: 'border-box' }}>
             部分数据缺失，故事生成可能不够精确。

@@ -1,27 +1,21 @@
 import React, { useState } from 'react';
-import Header from './components/Header'; // 1. 导入Header组件
+import Header from './components/Header';
 import Map from './components/Map';
 import CountryInfo from './components/CountryInfo';
 import FetchButton from './components/FetchButton';
 import LifeStoryTimeline from './components/LifeStoryTimeline';
 import { fetchCountryData } from './services/countryService';
 import { generateLifeStory } from './services/aiService';
-import { CountryData, LifeEvent, Metadata } from './types'; // 1. 导入新的类型
+import { CountryData, LifeEvent, Metadata } from './types';
 import './App.css';
 
 function App() {
-  // 当前“投胎”到的国家数据
   const [countryData, setCountryData] = useState<CountryData | null>(null);
-  // 新增：国家数据的元数据
   const [metadata, setMetadata] = useState<Metadata | null>(null);
-  // AI生成的人生故事事件
   const [lifeStory, setLifeStory] = useState<LifeEvent[] | null>(null);
-  // “投胎”按钮的加载状态
   const [isCountryLoading, setIsCountryLoading] = useState(false);
-  // “开启人生故事”按钮的加载状态
   const [isStoryLoading, setIsStoryLoading] = useState(false);
 
-  // 处理“投胎”按钮点击事件
   const handleReincarnate = async () => {
     setIsCountryLoading(true);
     setLifeStory(null); // 清空上一次的人生故事
@@ -36,14 +30,12 @@ function App() {
     }
   };
 
-  // 处理“开启人生故事”按钮点击事件
   const handleGenerateStory = async () => {
     if (!countryData) return;
 
     setIsStoryLoading(true);
     try {
-      // 调用真实AI接口。如果AI服务或密钥配置有问题，该函数内部会降级到模拟数据。
-      // @ts-ignore // TODO: aiService aill be updated later to accept the new CountryData type
+      // @ts-ignore
       const events = await generateLifeStory(countryData);
       setLifeStory(events);
     } catch (error) {
@@ -54,27 +46,25 @@ function App() {
   };
 
   return (
-    // 2. 创建一个新的根容器
     <div className="root-container"> 
       <Header />
       <div className="app-container">
         <div className="sidebar">
-          {/* -- 1. 将头部信息包裹在一个 div 中 -- */}
           <div className="sidebar-header">
-
             <CountryInfo 
               data={countryData}
               metadata={metadata}
               onGenerateStory={handleGenerateStory}
               isStoryLoading={isStoryLoading}
+              lifeStory={lifeStory} // 1. 将 lifeStory 状态传递给 CountryInfo
             />
-              <FetchButton 
+            <FetchButton 
               onClick={handleReincarnate} 
-              isLoading={isCountryLoading} 
-              text="开始投胎"
+              isLoading={isCountryLoading}
+              // 2. 根据 countryData 是否存在，动态改变按钮文本
+              text={countryData ? "重新投胎" : "开始投胎"}
             />
           </div>
-          {/* -- 2. 时间线组件现在是独立的，可以拥有自己的滚动条 -- */}
           <LifeStoryTimeline events={lifeStory} isLoading={isStoryLoading} />
         </div>
         <div className="map-area">

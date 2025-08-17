@@ -6,7 +6,7 @@ import Box from '@mui/material/Box'; // 1. 导入Box组件
 type FetchButtonProps = {
   onClick: () => void;
   isLoading: boolean;
-  text: string; // 按钮上显示的文字
+  text: string; // 1. 添加 text prop
 };
 
 function FetchButton({ onClick, isLoading, text }: FetchButtonProps) {
@@ -30,7 +30,7 @@ function FetchButton({ onClick, isLoading, text }: FetchButtonProps) {
             }}
           />
         ) : (
-          text
+          text // 2. 使用 text prop
         )}
       </Button>
     </Box>
