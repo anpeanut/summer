@@ -74,6 +74,14 @@ export interface LifeEvent {
   imgPrompt?: string;
 }
 
+// --- App Configuration Structures ---
+
+// 定义AI服务的配置信息结构
+export interface ApiKeyConfig {
+  apiKey: string;
+ 
+}
+
 // --- Deprecated v1.0 Type (for reference, can be removed later) ---
 export interface CountryDataExtended_v1 {
   id: string;

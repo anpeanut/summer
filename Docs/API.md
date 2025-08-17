@@ -232,3 +232,29 @@
    - 当 `dataCompleteness < 0.6` 时建议前端显示提示：
      > "部分数据缺失，故事生成可能不够精确"
 ```
+
+---
+
+## 获取云端配置
+
+### 请求
+- **URL**: `/api/hello`
+- **方法**: `GET`
+- **认证**: 不需要
+- **说明**: 用于在云端环境中获取敏感配置，例如AI服务的API密钥。当客户端在没有`.env`文件的环境中运行时（如Docker容器或云服务器），应调用此接口。
+
+### 成功响应 (HTTP 200)
+- **Content-Type**: `text/plain`
+- **内容**: 直接返回API密钥的字符串。
+```
+sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+### 错误响应 (HTTP 500)
+- **Content-Type**: `application/json`
+```json
+{
+  "error": "API_KEY_NOT_CONFIGURED",
+  "message": "The API key is not configured on the server."
+}
+```
