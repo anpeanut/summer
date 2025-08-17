@@ -38,20 +38,30 @@ const getApiKeyConfig = async (): Promise<ApiKeyConfig | null> => {
   }
 };
 
-
 /**
- * 通过调用AI API生成人生故事。
+ * 通过调用AI API流式生成人生故事。
  * @param countryData - 用于生成故事的扩展国家数据。
- * @returns 返回一个包含人生事件数组的Promise。
+ * @param onEventReceived - 每接收到一个完整的人生事件对象时调用的回调函数。
+ * @param onError - 发生错误时的回调函数。
+ * @param onComplete - 数据流结束时的回调函数。
  */
-export const generateLifeStory = async (countryData: CountryData): Promise<LifeEvent[]> => {
+export const generateLifeStory = async (
+  countryData: CountryData,
+  onEventReceived: (event: LifeEvent) => void,
+  onError: (error: Error) => void,
+  onComplete: () => void
+): Promise<void> => {
   const apiEndpoint = "https://api.siliconflow.cn/v1/chat/completions";
   // 1. 动态获取API配置
   const config = await getApiKeyConfig();
 
   if (!config) {
-    console.error("无法获取AI API配置，降级使用模拟数据。");
-    return generateMockLifeStory();
+    const error = new Error("无法获取AI API配置,使用模拟数据。");
+    const totalEvent= await generateMockLifeStory();
+    totalEvent.forEach(event => onEventReceived(event));
+    onError(error);
+    onComplete();
+    return;
   }
 
   const prompt = `### 角色扮演
@@ -81,7 +91,12 @@ ${JSON.stringify(countryData.storySeed, null, 2)}
     当触发隐藏主线时，后续事件应围绕这条主线展开。
 
 ### 输出格式 (严格要求)
-你 **必须** 返回一个纯粹的、不包含任何解释性文字或Markdown标记 (如 \`\`\`json) 的、格式完全正确的JSON数组。数组中的每个对象都必须严格遵循以下TypeScript接口定义：
+你 **必须** 以 **换行符分隔的JSON (NDJSON)** 格式进行输出。
+- **不要** 使用JSON数组的 \`[\` 和 \`]\`。
+- 每生成一个人生事件对象，就立即将其作为**一行**输出，并以换行符 \`\\n\` 结尾。
+- 每个输出的行都必须是一个**完整且独立**的JSON对象。
+- **不要** 在对象之间添加逗号。
+- 输出的JSON对象必须严格遵循以下TypeScript接口定义：
 
 \`\`\`typescript
 interface LifeEvent {
@@ -92,6 +107,11 @@ interface LifeEvent {
   imgPrompt?: string; // (可选) 为这个事件生成一张配图的AI绘画提示词，风格：动漫，赛璐璐
 }
 \`\`\`
+
+**示例输出:**
+{"year": 1998, "age": 3, "event": "...", "category": "Milestone"}
+{"year": 2001, "age": 6, "event": "...", "category": "Education"}
+{"year": 2014, "age": 19, "event": "...", "category": "Education", "imgPrompt": "..."}
 
 **现在，请开始生成故事。**
 `;
@@ -109,7 +129,7 @@ interface LifeEvent {
         messages: [{ role: "user", content: prompt }],
          response_format: { type: "json_object" }, // 明确要求JSON格式
         max_tokens: 20000,
-        stream: false,
+        stream: true,
       })
     });
 
@@ -118,56 +138,67 @@ interface LifeEvent {
       throw new Error(`AI API 请求失败，状态码: ${response.status}: ${errorBody}`);
     }
 
-    const result = await response.json();
-    
-    let content = result.choices[0].message.content;
-    // 增强的JSON清理和解析
-    const storyEvents = parseAIResponse(content);
-    return storyEvents;
+    if (!response.body) {
+      throw new Error("响应体为空");
+    }
 
+    // 处理流式响应
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let contentBuffer = ''; // Buffer for potentially fragmented JSON objects
 
-  } catch (error) {
-    console.error("生成人生故事时发生错误:", error);
-    return generateMockLifeStory();
-  }
-};
-// 新增：健壮的响应解析器
-function parseAIResponse(rawContent: string): LifeEvent[] {
-  try {
-    // 尝试直接解析
-    return JSON.parse(rawContent);
-  } catch (e) {
-    // 第一步清理：移除代码块标记
-    let cleaned = rawContent
-      .replace(/```(json)?/g, '')
-      .replace(/^[\s\S]*?($$|\{)/, '$1') // 替代/s标志的方案
-      .replace(/($$|\})[\s\S]*?$/, '$1')
-      .trim();
-    
-    // 第二步：修复常见格式问题
-    cleaned = cleaned
-      .replace(/(\w+):/g, '"$1":') // 为未加引号的key添加引号
-      .replace(/'/g, '"') // 单引号转双引号
-      .replace(/,\s*([}\]])/g, '$1'); // 移除尾部多余逗号
-    
-    try {
-      return JSON.parse(cleaned);
-    } catch (finalError) {
-      // 第三步：尝试提取有效JSON部分
-      const jsonMatch = cleaned.match(/(\[[\s\S]*?\])|(\{[\s\S]*?\})/);
-      if (jsonMatch) {
-        try {
-          return JSON.parse(jsonMatch[0]);
-        } catch {
-          // 最终回退：记录错误并返回模拟数据
-          console.error("无法解析的API响应:", cleaned.substring(0, 200));
-          throw new Error("API响应格式无效");
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      }
+      
+      buffer += decoder.decode(value, { stream: true });
+      
+      // The response is a Server-Sent Event (SSE) stream.
+      // We need to process it line by line.
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || ''; // Keep the last, possibly incomplete line.
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.substring(6);
+          if (data.trim() === '[DONE]') {
+            // Stream finished
+            break;
+          }
+          try {
+            const parsed = JSON.parse(data);
+            const deltaContent = parsed.choices[0]?.delta?.content;
+            if (deltaContent) {
+              contentBuffer += deltaContent;
+              // Try to parse the buffered content
+              // This is a simple approach; a more robust one would handle nested objects.
+              try {
+                  const lifeEvent: LifeEvent = JSON.parse(contentBuffer);
+                  // If parsing succeeds, we have a complete object.
+                  onEventReceived(lifeEvent);
+                  contentBuffer = ''; // Reset buffer for the next object
+              } catch (e) {
+                  // JSON is not yet complete, continue accumulating.
+              }
+            }
+          } catch (e) {
+            // Ignore parsing errors for individual chunks
+          }
         }
       }
-      throw finalError;
     }
+
+  } catch (error) {
+    console.error("生成人生故事时发生流式错误:", error);
+    onError(error as Error);
+  } finally {
+    onComplete();
   }
-}
+};
+
 /**
  * 提供一个模拟的人生故事，用于开发和测试。
  * @returns 返回一个预定义的、包含人生事件数组的Promise。

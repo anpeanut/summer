@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Header from './components/Header';
 import Map from './components/Map';
 import CountryInfo from './components/CountryInfo';
@@ -12,13 +12,23 @@ import './App.css';
 function App() {
   const [countryData, setCountryData] = useState<CountryData | null>(null);
   const [metadata, setMetadata] = useState<Metadata | null>(null);
-  const [lifeStory, setLifeStory] = useState<LifeEvent[] | null>(null);
+  const [lifeStory, setLifeStory] = useState<LifeEvent[]>([]); // Changed initial state to empty array
   const [isCountryLoading, setIsCountryLoading] = useState(false);
   const [isStoryLoading, setIsStoryLoading] = useState(false);
+  const [eventQueue, setEventQueue] = useState<LifeEvent[]>([]);
+  
+  const animationTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const streamCompleteRef = useRef<boolean>(false);
 
   const handleReincarnate = async () => {
     setIsCountryLoading(true);
-    setLifeStory(null); // 清空上一次的人生故事
+    setLifeStory([]);
+    setEventQueue([]);
+    streamCompleteRef.current = false;
+    if (animationTimerRef.current) {
+      clearInterval(animationTimerRef.current);
+      animationTimerRef.current = null;
+    }
     try {
       const response = await fetchCountryData();
       setCountryData(response.data);
@@ -30,20 +40,58 @@ function App() {
     }
   };
 
-  const handleGenerateStory = async () => {
+  const handleGenerateStory = () => {
     if (!countryData) return;
 
+    setLifeStory([]);
+    setEventQueue([]);
+    streamCompleteRef.current = false;
     setIsStoryLoading(true);
-    try {
-      // @ts-ignore
-      const events = await generateLifeStory(countryData);
-      setLifeStory(events);
-    } catch (error) {
-      console.error("生成人生故事失败:", error);
-    } finally {
-      setIsStoryLoading(false);
-    }
+
+    generateLifeStory(
+      countryData,
+      (newEvent) => {
+        setEventQueue(prevQueue => [...prevQueue, newEvent]);
+      },
+      (error) => {
+        console.error("故事生成流式错误:", error);
+        setIsStoryLoading(false);
+      },
+      () => {
+        streamCompleteRef.current = true;
+      }
+    );
   };
+
+  useEffect(() => {
+    if (eventQueue.length > 0 && !animationTimerRef.current) {
+      animationTimerRef.current = setInterval(() => {
+        setEventQueue(prevQueue => {
+          const newQueue = [...prevQueue];
+          const nextEvent = newQueue.shift();
+          
+          if (nextEvent) {
+            setLifeStory(prevStory => [...prevStory, nextEvent]);
+          }
+          
+          if (newQueue.length === 0) {
+            clearInterval(animationTimerRef.current!);
+            animationTimerRef.current = null;
+            if (streamCompleteRef.current) {
+              setIsStoryLoading(false);
+            }
+          }
+          return newQueue;
+        });
+      }, 500); 
+    }
+
+    return () => {
+      if (animationTimerRef.current) {
+        clearInterval(animationTimerRef.current);
+      }
+    };
+  }, [eventQueue]);
 
   return (
     <div className="root-container"> 
@@ -56,12 +104,12 @@ function App() {
               metadata={metadata}
               onGenerateStory={handleGenerateStory}
               isStoryLoading={isStoryLoading}
-              lifeStory={lifeStory} // 1. 将 lifeStory 状态传递给 CountryInfo
+              lifeStory={lifeStory}
             />
             <FetchButton 
               onClick={handleReincarnate} 
               isLoading={isCountryLoading}
-              // 2. 根据 countryData 是否存在，动态改变按钮文本
+             
               text={countryData ? "重新投胎" : "开始投胎"}
             />
           </div>
