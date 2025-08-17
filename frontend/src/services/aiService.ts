@@ -118,6 +118,7 @@ export const generateLifeStory = async (
             const parsed = JSON.parse(data);
             const deltaContent = parsed.choices[0]?.delta?.content;
             if (deltaContent) {
+              console.log(`[${new Date().toISOString()}] LOG: AI Service - Received content chunk.`);
               contentBuffer += deltaContent;
               
               // 检查内容缓冲区中是否有完整的NDJSON行
@@ -125,9 +126,17 @@ export const generateLifeStory = async (
               contentBuffer = contentLines.pop() || ''; // 保留不完整的JSON行
 
               for (const contentLine of contentLines) {
-                if (contentLine.trim()) {
-                  const event = parseNdjsonLine(contentLine);
+                // 增加更严格的检查：只有以'{'开头的行才被认为是有效的JSON对象
+                if (contentLine.trim().startsWith('{')) {
+                  const event = parseNdjsonLine(contentLine, (error, line) => {
+                    // 当单行解析失败时，在控制台打印详细错误，而不是让整个流失败
+                    console.error("单行解析失败，已跳过:", {
+                      line,
+                      error,
+                    });
+                  });
                   if (event) {
+                    console.log(`[${new Date().toISOString()}] LOG: AI Service - Parsed and sending event for year ${event.year}.`);
                     onEventReceived(event);
                   }
                 }
@@ -138,6 +147,20 @@ export const generateLifeStory = async (
           }
         }
       }
+    }
+
+    // After the loop, process any remaining data in the buffer
+    if (contentBuffer.trim().length > 0) {
+        console.log(`[${new Date().toISOString()}] LOG: AI Service - Processing final buffer content.`);
+        if (contentBuffer.trim().startsWith('{')) {
+            const event = parseNdjsonLine(contentBuffer, (error, line) => {
+                console.error("Final buffer parsing failed, skipping:", { line, error });
+            });
+            if (event) {
+                console.log(`[${new Date().toISOString()}] LOG: AI Service - Parsed and sending final event for year ${event.year}.`);
+                onEventReceived(event);
+            }
+        }
     }
   } catch (error) {
     console.error("生成人生故事时发生流式错误:", error);
@@ -152,11 +175,14 @@ export const generateLifeStory = async (
  * @param line - 从流中接收到的一行文本。
  * @returns 如果解析成功，返回LifeEvent对象；否则返回null。
  */
-function parseNdjsonLine(line: string): LifeEvent | null {
+function parseNdjsonLine(
+  line: string,
+  onError: (error: Error, line: string) => void
+): LifeEvent | null {
   try {
     // 尝试直接解析最干净的情况
     return JSON.parse(line);
-  } catch (e) {
+  } catch (e: any) {
     // 如果直接解析失败，尝试进行清理
     // 1. 寻找被包裹的JSON对象
     const jsonMatch = line.match(/\{.*\}/);
@@ -164,14 +190,14 @@ function parseNdjsonLine(line: string): LifeEvent | null {
       try {
         // 2. 尝试解析提取出的部分
         return JSON.parse(jsonMatch[0]);
-      } catch (finalError) {
-        // 如果清理后仍然失败，则放弃这一行
-        console.warn("无法解析的流数据行:", line);
+      } catch (finalError: any) {
+        // 如果清理后仍然失败，则调用错误回调
+        onError(new Error(`无法解析清理后的JSON: ${finalError.message}`), line);
         return null;
       }
     }
-    // 如果连花括号都找不到，基本可以确定不是有效数据
-    console.warn("已丢弃无效的流数据行:", line);
+    // 如果连花括号都找不到，调用错误回调
+    onError(new Error(`无效的流数据行，无法找到JSON对象: ${e.message}`), line);
     return null;
   }
 }

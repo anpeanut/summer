@@ -71,3 +71,14 @@ button:hover {
 .timeline-item-appear {
   animation: fadeInUp 0.5s ease-out forwards;
 }
+
+/* 新增：错误信息样式 */
+.error-message {
+  padding: 10px;
+  margin: 10px 0;
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #c62828;
+  border-radius: 4px;
+  text-align: center;
+}

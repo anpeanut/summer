@@ -35,7 +35,7 @@ function CountryInfo({ data, metadata, onGenerateStory, isStoryLoading, lifeStor
   // 3. 动态计算按钮文本和状态
   const getButtonState = () => {
     if (lifeStory && lifeStory.length > 0) {
-      return { text: '重新生成你的人生故事', disabled: true };
+      return { text: '重新生成你的人生故事', disabled: false };
     }
     if (isStoryLoading) {
       return { text: '正在生成...', disabled: true };
