@@ -3,6 +3,8 @@ from app.schemas.country import country_schema
 from app import db
 from app.models import Country, Demographic
 from app.utils.api_response import ApiResponse
+import random
+from flask_sqlalchemy import func
 
 class CountryService:
     @staticmethod
