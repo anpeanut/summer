@@ -2,15 +2,16 @@ from cerberus import Validator
 from app.schemas.country import country_schema
 from app import db
 from app.models import Country, Demographic
-from app.utils.api_response import ApiResponse
+from app.utils.api_response import APIResponse
 import random
-from flask_sqlalchemy import func
+from sqlalchemy import func
 
 class CountryService:
     @staticmethod
     def validate_country_data(input_data: dict) -> tuple:
         validator = Validator(country_schema)
         if not validator.validate(input_data):
+            print("Cerberus validation errors:", validator.errors)
             return False, validator.errors
         return True, validator.normalized(input_data)
     
@@ -25,20 +26,20 @@ class CountryService:
         if flag:
             valid, data = CountryService.validate_country_data(country)
             if valid:
-                return True, ApiResponse.success(data)
+                return True, APIResponse.success(data)
             else:
-                return False, ApiResponse.error("400", "Invalid country data", str(data))
+                return False, APIResponse.error("400", "Invalid country data", str(data))
         else:
-            return False, data # 返回错误信息
+            return False, country # 返回错误信息
     
     @staticmethod
-    def get_country_data(country_code: str):
+    def get_country_data(country_code: str) -> tuple[bool, dict]:
         """获取国家完整数据 (ORM实现)"""
         # 使用SQLAlchemy查询国家数据（自动关联关系）
         country = Country.query.filter_by(id=country_code.upper()).first()
         
         if not country:
-            return False, ApiResponse.error("404", "国家数据不存在")
+            return False, APIResponse.error("404", "国家数据不存在")
         
         # 构建响应数据
         return True, {
@@ -60,19 +61,7 @@ class CountryService:
         if not geojson_data:
             return {"type": "FeatureCollection", "features": []}
         
-        return {
-            "type": geojson_data.feature_type,
-            "features": [
-                {
-                    "type": "Feature",
-                    "properties": {},
-                    "geometry": {
-                        "type": geojson_data.geometry_type,
-                        "coordinates": geojson_data.coordinates
-                    }
-                }
-            ]
-        }
+        return geojson_data.coordinates
     
     @staticmethod
     def _format_story_seed(country):
@@ -146,7 +135,7 @@ class CountryService:
         ]
     
     @staticmethod
-    def get_random_country_by_birth_weight():
+    def get_random_country_by_birth_weight() -> tuple[bool, dict]:
         """按出生率×总人口加权随机选择国家"""
         try:
             # 1. 查询国家基础数据和出生率（处理缺失值）
@@ -164,7 +153,7 @@ class CountryService:
             ).all()
 
             if not countries_data:
-                return False, ApiResponse.error("500", "没有可用的国家数据")
+                return False, APIResponse.error("500", "没有可用的国家数据")
 
             # 2. 计算权重（出生率×总人口）并提取国家信息
             country_ids = []
@@ -197,8 +186,8 @@ class CountryService:
             print(f"随机选择结果: {selected['name']} (权重: {selected['weight']:.2f}万新生儿当量)")
 
             # 5. 返回选中国家的完整数据
-            return CountryService.get_country_data()
+            return CountryService.get_country_data(selected_country_id)
             
         except Exception as e:
             print(f"随机选择国家失败: {str(e)}")
-            return False, ApiResponse.error("500", "随机选择国家时发生错误")
+            return False, APIResponse.error("500", "随机选择国家时发生错误")

@@ -43,7 +43,9 @@ country_schema = {
                                             'items': [
                                                 {'type': 'float', 'min': -180, 'max': 180},
                                                 {'type': 'float', 'min': -90, 'max': 90}
-                                            ]
+                                            ],
+                                            'minlength': 2,  # 确保每个点有 2 个元素
+                                            'maxlength': 2
                                         }
                                     }
                                 }

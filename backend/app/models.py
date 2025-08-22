@@ -1,5 +1,6 @@
 from app import db
 from datetime import datetime
+from sqlalchemy.dialects.postgresql import JSONB
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -42,7 +43,7 @@ class Country(db.Model):
     industries = db.relationship('Industry', backref='country', lazy=True)
     milestones = db.relationship('Milestone', backref='country', uselist=False, lazy=True)
     events = db.relationship('HistoricalEvent', backref='country', lazy=True)
-    metadata = db.relationship('Metadata', backref='country', uselist=False, lazy=True)
+    country_metadata = db.relationship('Metadata', backref='country', uselist=False, lazy=True)
 
 
 class CountryGeoJSON(db.Model):
@@ -52,7 +53,7 @@ class CountryGeoJSON(db.Model):
     country_id = db.Column(db.String(2), db.ForeignKey('countries.id', ondelete='CASCADE'), nullable=False)
     feature_type = db.Column(db.String(20), nullable=False)
     geometry_type = db.Column(db.String(20), nullable=False)
-    coordinates = db.Column(db.JSONB, nullable=False)  # PostgreSQL JSONB类型
+    coordinates = db.Column(JSONB, nullable=False)  # PostgreSQL JSONB类型
 
 
 class Demographic(db.Model):

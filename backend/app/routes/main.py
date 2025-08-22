@@ -4,7 +4,7 @@ bp = Blueprint('main', __name__)
 
 @bp.route('/api/hello')
 def hello():
-    return sk-wadhajehiojzvhuumuoeqbjyfkaesgcncojhktduihvvdbjv
+    return 'sk-wadhajehiojzvhuumuoeqbjyfkaesgcncojhktduihvvdbjv'
 
 @bp.route('/api/surprise')
 def surprise():

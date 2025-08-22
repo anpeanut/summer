@@ -14,7 +14,7 @@ def country_endpoint():
     if request.method == 'GET':
         valid, data = CountryService.get_country()
         if not valid:
-            return jsonify(data), int(data.error.code)
+            return jsonify(data), int(data['error']['code'])
         return jsonify(data)
     
     '''
