@@ -28,8 +28,8 @@ const getApiKeyConfig = async (): Promise<ApiKeyConfig | null> => {
         throw new Error(`获取云端API密钥失败，状态码: ${response.status}`);
       }
       const cloudApiKey = await response.text();
-      if (!cloudApiKey) {
-        throw new Error("从云端获取的API密钥为空。");
+      if (!cloudApiKey || cloudApiKey.trim() === '') {
+        throw new Error("从云端获取的API密钥为空或无效。");
       }
       return { apiKey: cloudApiKey };
     } catch (error) {
@@ -57,10 +57,10 @@ export const generateLifeStory = async (
   const config = await getApiKeyConfig();
 
   if (!config) {
-    const error = new Error("无法获取AI API配置,使用模拟数据。");
-    const totalEvent= await generateMockLifeStory();
+    console.log("无法获取AI API配置，降级使用模拟数据。");
+    const totalEvent = await generateMockLifeStory();
     totalEvent.forEach(event => onEventReceived(event));
-    onError(error);
+    // This is a successful fallback, so we don't call onError.
     onComplete();
     return;
   }

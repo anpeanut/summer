@@ -98,7 +98,7 @@ const mockMetadata: Metadata = {
  */
 export const fetchCountryData = async (): Promise<CountryServiceResponse> => {
   //const useMock = process.env.REACT_APP_USE_MOCK_API === 'true';
- const useMock =true
+ const useMock =false
   if (useMock) {
     console.log("【模式】: 使用内置模拟数据 (countryService.ts)");
     await new Promise(resolve => setTimeout(resolve, 300));
