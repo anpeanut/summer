@@ -65,7 +65,7 @@ function App() {
     generateLifeStory(
       countryData,
       (newEvent) => {
-        console.log(`[${new Date().toISOString()}] LOG: App.tsx - Received event for year ${newEvent.year}, pushing to queue.`);
+        //console.log(`[${new Date().toISOString()}] LOG: App.tsx - Received event for year ${newEvent.year}, pushing to queue.`);
         eventQueueRef.current.push(newEvent);
       },
       (error) => {
@@ -74,7 +74,7 @@ function App() {
         setIsStoryLoading(false);
       },
       () => {
-        console.log(`[${new Date().toISOString()}] LOG: App.tsx - Stream has completed.`);
+        //console.log(`[${new Date().toISOString()}] LOG: App.tsx - Stream has completed.`);
         streamCompletedRef.current = true;
       }
     );
@@ -91,14 +91,14 @@ function App() {
   useEffect(() => {
     // 仅在 isStoryLoading 状态为 true 时才运行动画循环
     if (isStoryLoading) {
-      console.log(`[${new Date().toISOString()}] LOG: App.tsx - useEffect triggered, starting animation timer.`);
+      //console.log(`[${new Date().toISOString()}] LOG: App.tsx - useEffect triggered, starting animation timer.`);
       animationTimerRef.current = setInterval(() => {
         // 优先处理队列中的事件
         if (eventQueueRef.current.length > 0) {
-          console.log(`[${new Date().toISOString()}] LOG: App.tsx - Timer tick, queue has ${eventQueueRef.current.length} items.`);
+          //console.log(`[${new Date().toISOString()}] LOG: App.tsx - Timer tick, queue has ${eventQueueRef.current.length} items.`);
           const nextEvent = eventQueueRef.current.shift();
           if (nextEvent) {
-            console.log(`[${new Date().toISOString()}] LOG: App.tsx - Displaying event for year ${nextEvent.year}.`);
+           // console.log(`[${new Date().toISOString()}] LOG: App.tsx - Displaying event for year ${nextEvent.year}.`);
             // 更新 state 以触发UI渲染
             setLifeStory(prevStory => [...prevStory, nextEvent]);
           }
