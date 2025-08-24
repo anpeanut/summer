@@ -3,6 +3,9 @@
 # 虚拟环境
 /venv
 
+#测试
+/test
+
 # 依赖
 /node_modules
 /frontend/node_modules
