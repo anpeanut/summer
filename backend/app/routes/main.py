@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, Response, jsonify
+from flask import Blueprint, render_template, request, Response, jsonify, current_app
 from ..services.ai_service import generate_life_story_stream
 
 bp = Blueprint('main', __name__)
@@ -20,8 +20,12 @@ def generate_story():
     if not country_data:
         return jsonify({"error": "请求体中缺少国家数据"}), 400
 
-    # 创建一个生成器，它会流式地从AI服务获取数据
-    stream = generate_life_story_stream(country_data)
+    # 在请求上下文中提前获取配置
+    api_key = current_app.config.get('SILICONFLOW_API_KEY')
+    api_base = current_app.config.get('SILICONFLOW_API_BASE')
+
+    # 创建一个生成器，并将配置作为参数传递给它
+    stream = generate_life_story_stream(country_data, api_key, api_base)
 
     # 使用Response对象将生成器作为流式响应返回
     # mimetype='application/x-ndjson' 告知客户端这是一个NDJSON流

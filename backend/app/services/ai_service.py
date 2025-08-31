@@ -1,7 +1,6 @@
 import requests
 import json
 import re
-from flask import current_app
 from ..prompts.life_story_prompt import get_life_story_prompt
 
 def parse_ndjson_line(line: str):
@@ -23,27 +22,26 @@ def parse_ndjson_line(line: str):
                 return json.loads(json_match.group(0))
             except json.JSONDecodeError as final_error:
                 # 如果清理后仍然失败，则记录错误
-                current_app.logger.error(f"无法解析清理后的JSON: {final_error}, 原始行: '{line}'")
+                # 在生成器中，我们无法安全地访问 current_app.logger
+                print(f"错误: 无法解析清理后的JSON: {final_error}, 原始行: '{line}'")
                 return None
         # 如果连花括号都找不到，记录错误
-        current_app.logger.error(f"无效的流数据行，无法找到JSON对象: '{line}'")
+        print(f"错误: 无效的流数据行，无法找到JSON对象: '{line}'")
         return None
 
-def generate_life_story_stream(country_data):
+def generate_life_story_stream(country_data, api_key, api_base):
     """
     通过直接调用API流式生成人生故事，忠实迁移前端 past.ts 的核心逻辑。
     这是一个生成器函数，会逐个产出（yield）解析后的人生事件对象。
     @param country_data: 用于生成故事的国家数据。
+    @param api_key: 从应用上下文中传入的API密钥。
+    @param api_base: 从应用上下文中传入的API基地址。
     """
-    api_key = current_app.config.get('SILICONFLOW_API_KEY')
-    api_base = current_app.config.get('SILICONFLOW_API_BASE', 'https://api.siliconflow.cn/v1')
-    api_endpoint = f"{api_base}/chat/completions"
-
     if not api_key:
-        current_app.logger.error("错误：后端未配置SILICONFLOW_API_KEY。")
-        # 在生产环境中，你可能想抛出一个异常或返回一个错误消息
-        # 为了与前端的降级逻辑对齐，这里我们返回一个空生成器
+        print("错误：API密钥未提供给生成器。")
         return
+
+    api_endpoint = f"{api_base}" if api_base else "https://api.siliconflow.cn/v1/chat/completions"
         
     prompt = get_life_story_prompt(country_data)
 
@@ -62,12 +60,15 @@ def generate_life_story_stream(country_data):
         with requests.post(api_endpoint, headers=headers, json=payload, stream=True) as response:
             response.raise_for_status()  # 如果状态码不是2xx，则抛出异常
             
+            # 强制指定响应的编码为 UTF-8，从根源上解决乱码问题
+            response.encoding = 'utf-8'
+            
             sse_buffer = ''
             content_buffer = ''
-            decoder = response.encoding if response.encoding else 'utf-8'
+            
+            print("成功连接到AI API，开始接收流式数据...")
 
-            current_app.logger.info("成功连接到AI API，开始接收流式数据...")
-
+            # decode_unicode=True 将使用上面设置的 response.encoding (utf-8)
             for chunk in response.iter_content(chunk_size=None, decode_unicode=True):
                 sse_buffer += chunk
                 
@@ -79,7 +80,7 @@ def generate_life_story_stream(country_data):
                     if sse_line.startswith('data: '):
                         data_str = sse_line[6:]
                         if data_str.strip() == '[DONE]':
-                            current_app.logger.info("接收到 [DONE] 信号，数据流结束。")
+                            print("接收到 [DONE] 信号，数据流结束。")
                             break
                         try:
                             parsed_data = json.loads(data_str)
@@ -95,26 +96,26 @@ def generate_life_story_stream(country_data):
                                     if content_line.strip().startswith('{'):
                                         event = parse_ndjson_line(content_line)
                                         if event:
-                                            current_app.logger.info(f"成功解析并产出事件: 年份 {event.get('year')}")
+                                            print(f"成功解析并产出事件: 年份 {event.get('year')}")
                                             yield json.dumps(event) + '\n'
                         except json.JSONDecodeError:
-                            current_app.logger.warning(f"无法解析此SSE数据块: '{data_str}'")
+                            print(f"警告: 无法解析此SSE数据块: '{data_str}'")
                             continue # 忽略单个损坏的SSE块
             
             # 处理循环结束后缓冲区中可能剩余的最后一部分数据
             if content_buffer.strip().startswith('{'):
-                current_app.logger.info("正在处理缓冲区中的最后一个事件...")
+                print("正在处理缓冲区中的最后一个事件...")
                 event = parse_ndjson_line(content_buffer)
                 if event:
-                    current_app.logger.info(f"成功解析并产出最后一个事件: 年份 {event.get('year')}")
+                    print(f"成功解析并产出最后一个事件: 年份 {event.get('year')}")
                     yield json.dumps(event) + '\n'
 
     except requests.exceptions.RequestException as e:
-        current_app.logger.error(f"调用AI API时发生网络错误: {e}")
+        print(f"错误: 调用AI API时发生网络错误: {e}")
         # 在实际应用中，这里可以 yield 一个错误对象
         error_event = {"error": True, "message": str(e)}
         yield json.dumps(error_event) + '\n'
     except Exception as e:
-        current_app.logger.error(f"处理AI流时发生未知错误: {e}")
+        print(f"错误: 处理AI流时发生未知错误: {e}")
         error_event = {"error": True, "message": "An unexpected error occurred."}
         yield json.dumps(error_event) + '\n'
