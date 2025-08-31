@@ -70,7 +70,7 @@ export interface LifeEvent {
   year: number;
   age: number;
   event: string;
-  category: 'Education' | 'Career' | 'Relationship' | 'Milestone' | 'WorldEvent' | 'Special';
+  category: 'Education' | 'Career' | 'Relationship' | 'Milestone' | 'WorldEvent' | 'Special' | 'error';
   imgPrompt?: string;
 }
 

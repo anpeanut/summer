@@ -16,7 +16,7 @@ def country_endpoint():
         if not valid:
             return jsonify(data), int(data['error']['code'])
         return jsonify(data)
-    
+
     '''
     elif request.method == 'POST':
         input_data = request.get_json(silent=True) or {}
@@ -31,4 +31,3 @@ def country_endpoint():
             
         return jsonify(APIResponse.success(result))
     '''
-    
