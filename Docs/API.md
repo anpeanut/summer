@@ -235,26 +235,67 @@
 
 ---
 
-## 获取云端配置
+## 返回你好
 
 ### 请求
 - **URL**: `/api/hello`
 - **方法**: `GET`
 - **认证**: 不需要
-- **说明**: 用于在云端环境中获取敏感配置，例如AI服务的API密钥。当客户端在没有`.env`文件的环境中运行时（如Docker容器或云服务器），应调用此接口。
+- **说明**: 无
 
 ### 成功响应 (HTTP 200)
 - **Content-Type**: `text/plain`
-- **内容**: 直接返回API密钥的字符串。
-```
-sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+- **内容**: hello world。
+
+
+
 ```
 
-### 错误响应 (HTTP 500)
-- **Content-Type**: `application/json`
-```json
-{
-  "error": "API_KEY_NOT_CONFIGURED",
-  "message": "The API key is not configured on the server."
-}
-```
+---
+
+## 3. 生成人生故事 (流式)
+
+- **Endpoint**: `POST /api/generate-story`
+- **描述**: 接收一个国家的数据作为输入，通过调用后端的AI服务，以流式（streaming）的方式返回一个虚构的人生故事。此接口将API密钥安全地保留在后端。
+- **请求体 (Request Body)**:
+  - `Content-Type: application/json`
+  - 请求体应包含一个国家的数据对象，与 `/api/country` 返回的 `data` 字段结构相似。
+    ```json
+    {
+      "id": "CN",
+      "name": "中国",
+      "population": 1412000000,
+      "capital": "北京",
+      "location": {
+        "type": "Point",
+        "coordinates": [104.1954, 35.8617]
+      },
+      "storySeed": { ... }
+    }
+    ```
+- **成功响应 (200 OK)**:
+  - `Content-Type: application/x-ndjson`
+  - 响应是一个数据流，由换行符 (`\n`) 分隔的JSON对象组成。每个JSON对象代表一个人生事件。
+    ```json
+    {"year": 1985, "age": 0, "event": "在一个普通的家庭中，我出生了。", "category": "Milestone"}
+    {"year": 1991, "age": 6, "event": "我开始了我的小学教育。", "category": "Education"}
+    ...
+    ```
+- **错误响应 (400 Bad Request)**:
+  - 如果请求体不是有效的JSON。
+    ```json
+    {
+      "apiVersion": "1.0",
+      "success": false,
+      "timestamp": "...",
+      "error": {
+        "code": "400",
+        "message": "Request body must be a valid JSON."
+      }
+    }
+    ```
+- **错误响应 (500 Internal Server Error)**:
+  - 如果后端AI密钥未配置或AI服务调用失败，响应流中会包含一个错误事件。
+    ```json
+    {"year": 1990, "age": 0, "event": "错误：AI服务的API密钥未配置。请检查后端环境变量。", "category": "error"}
+    ```
