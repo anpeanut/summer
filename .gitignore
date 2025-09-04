@@ -6,6 +6,9 @@
 #测试
 /test
 
+#缓存
+/backend/app/static/shapefile_cache
+
 # 依赖
 /node_modules
 /frontend/node_modules

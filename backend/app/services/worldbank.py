@@ -14,11 +14,14 @@ class WorldBankSource(BaseDataSource):
         indicators = {
             "economy": {
                 "gdp": "NY.GDP.PCAP.CD",  # 人均GDP
-                "gdp_growth": "NY.GDP.MKTP.KD.ZG"  # GDP增长率
+                "gdp_growth": "NY.GDP.MKTP.KD.ZG",  # GDP增长率
+                "internet_penetration": "IT.NET.USER.ZS"  # 新增：互联网普及率
             },
             "demographics": {
                 "urban_population": "SP.URB.TOTL.IN.ZS",  # 城市人口比例
-                "life_expectancy": "SP.DYN.LE00.IN"  # 预期寿命
+                "life_expectancy": "SP.DYN.LE00.IN",  # 预期寿命
+                "birth_rate": "SP.DYN.CBRT.IN",           # 出生率 (每千人)
+                "median_age": "SP.POP.TOTL.MA.ZS"         # 中位年龄
             },
             "education": {
                 "literacy_rate": "SE.ADT.LITR.ZS"  # 识字率

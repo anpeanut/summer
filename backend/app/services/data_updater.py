@@ -152,8 +152,8 @@ class DataUpdater:
     # 数据库操作方法（有SELECT权限的优化版）
     # ------------------------------
     def _upsert_country(self, country_data: Dict[str, Any]) -> bool:
-        print("country_data ")
-        return True # 临时跳过数据库操作，避免重复插入
+        #print("country_data: ", country_data)
+        #return True # 临时跳过数据库操作，避免重复插入
 
         """更新/插入国家基本信息（有SELECT权限优化版）"""
         country_id = country_data.get("id")
@@ -194,8 +194,8 @@ class DataUpdater:
             return False
 
     def _upsert_geojson(self, geojson_data: Dict[str, Any]) -> bool:
-        print("geojson_data: ", geojson_data)
-        return True # 临时跳过数据库操作，避免重复插入
+        #print("geojson_data: ", geojson_data)
+        #return True # 临时跳过数据库操作，避免重复插入
 
         """更新/插入GeoJSON数据（有SELECT权限优化版）"""
         country_id = geojson_data.get("country_id")
@@ -206,15 +206,15 @@ class DataUpdater:
             geojson = self.db.query(CountryGeoJSON).get(country_id)
 
             if geojson:
-                geojson.feature_type = geojson_data.get("feature_type", "country_boundary")
-                geojson.geometry_type = geojson_data.get("geometry_type")
-                geojson.coordinates = geojson_data.get("coordinates", {})
+                geojson.feature_type = 'FeatureCollection'
+                geojson.geometry_type = geojson_data.get("geometry", {}).get("type")
+                geojson.coordinates = {"type": "FeatureCollection", "features": [geojson_data]}
             else:
                 geojson = CountryGeoJSON(
                     country_id=country_id,
-                    feature_type=geojson_data.get("feature_type", "country_boundary"),
-                    geometry_type=geojson_data.get("geometry_type"),
-                    coordinates=geojson_data.get("coordinates", {})
+                    feature_type='FeatureCollection',
+                    geometry_type=geojson_data.get("geometry", {}).get("type"),
+                    coordinates={"type": "FeatureCollection", "features": [geojson_data]}
                 )
                 self.db.add(geojson)
 
@@ -227,25 +227,25 @@ class DataUpdater:
             return False
 
     def _upsert_demographics(self, country_id: str, demo_data: Dict[str, Any]) -> bool:
-        print("demo_data ")
-        return True # 临时跳过数据库操作，避免重复插入
+        #print("demo_data: ", demo_data)
+        #return True # 临时跳过数据库操作，避免重复插入
 
         """更新/插入人口统计数据（有SELECT权限优化版）"""
         try:
             demo = self.db.query(Demographic).get(country_id)
 
             if demo:
-                demo.urban_ratio = parse_decimal(demo_data.get("urban_ratio"))
-                demo.life_expectancy = parse_decimal(demo_data.get("life_expectancy"))
-                demo.median_age = parse_decimal(demo_data.get("median_age"))
-                demo.birth_rate = parse_decimal(demo_data.get("birth_rate"))
+                demo.urban_ratio = parse_decimal(demo_data.get("demographics", {}).get("urban_population") / 100)
+                demo.life_expectancy = parse_decimal(demo_data.get('demographics', {}).get("life_expectancy"))
+                demo.median_age = parse_decimal(demo_data.get('demographics', {}).get("median_age"))
+                demo.birth_rate = parse_decimal(demo_data.get('demographics', {}).get("birth_rate"))
             else:
                 demo = Demographic(
                     country_id=country_id,
-                    urban_ratio=parse_decimal(demo_data.get("urban_ratio")),
-                    life_expectancy=parse_decimal(demo_data.get("life_expectancy")),
-                    median_age=parse_decimal(demo_data.get("median_age")),
-                    birth_rate=parse_decimal(demo_data.get("birth_rate"))
+                    urban_ratio=parse_decimal(demo_data.get("demographics", {}).get("urban_population") / 100),
+                    life_expectancy=parse_decimal(demo_data.get('demographics', {}).get("life_expectancy")),
+                    median_age=parse_decimal(demo_data.get('demographics', {}).get("median_age")),
+                    birth_rate=parse_decimal(demo_data.get('demographics', {}).get("birth_rate"))
                 )
                 self.db.add(demo)
 
@@ -258,21 +258,21 @@ class DataUpdater:
             return False
 
     def _upsert_economy(self, country_id: str, economy_data: Dict[str, Any]) -> bool:
-        print("economy_data ")
-        return True # 临时跳过数据库操作，避免重复插入
+        #print("economy_data: ", economy_data)
+        #return True # 临时跳过数据库操作，避免重复插入
 
         """更新/插入经济数据（有SELECT权限优化版）"""
         try:
             economy = self.db.query(Economy).get(country_id)
 
             if economy:
-                economy.gdp_per_capita = parse_decimal(economy_data.get("gdp_per_capita"))
-                economy.internet_penetration = parse_decimal(economy_data.get("internet_penetration"))
+                economy.gdp_per_capita = parse_decimal(economy_data.get("economy", {}).get("gdp"))
+                economy.internet_penetration = parse_decimal(economy_data.get("economy", {}).get("internet_penetration"))
             else:
                 economy = Economy(
                     country_id=country_id,
-                    gdp_per_capita=parse_decimal(economy_data.get("gdp_per_capita")),
-                    internet_penetration=parse_decimal(economy_data.get("internet_penetration"))
+                    gdp_per_capita=parse_decimal(economy_data.get("economy", {}).get("gdp")),
+                    internet_penetration=parse_decimal(economy_data.get("economy", {}).get("internet_penetration"))
                 )
                 self.db.add(economy)
 
