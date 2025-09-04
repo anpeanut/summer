@@ -18,16 +18,17 @@ class APIClient:
         )
         self.session.mount('https://', HTTPAdapter(max_retries=retries))
     
-    def get(self, url: str, params: Optional[Dict] = None, headers: Optional[Dict] = None) -> Any:
+    def get(self, url: str, params: Optional[Dict] = None, headers: Optional[Dict] = None, stream: bool = False) -> Any:
         try:
             response = self.session.get(
                 url,
                 params=params,
                 headers=headers,
-                timeout=Config.REQUEST_TIMEOUT
+                timeout=Config.REQUEST_TIMEOUT,
+                stream=stream
             )
             response.raise_for_status()
-            return response.json()
+            return response.json() if not stream else response
         except requests.exceptions.RequestException as e:
             logger.error(f"API request failed: {str(e)}")
             

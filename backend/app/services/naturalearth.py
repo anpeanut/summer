@@ -4,8 +4,14 @@ import logging
 import requests
 import zipfile
 import io
+import os
+from pathlib import Path
 from pathlib import Path
 import json
+import shapefile  # 新增：导入pyshp库解析Shapefile
+from shapely.geometry import shape  # 新增：处理几何数据
+from shapely.geometry.base import BaseGeometry
+from shapely.errors import TopologicalError
 from app.utils.data_utils import normalize_country_code
 
 logger = logging.getLogger(__name__)
@@ -46,6 +52,7 @@ class NaturalEarthSource(BaseDataSource):
     
     def _download_and_extract(self, url: str) -> bool:
         """下载并解压GeoJSON文件"""
+        print("Downloading and extracting GeoJSON...")
         try:
             response = self.client.get(url, stream=True)
             response.raise_for_status()
@@ -54,6 +61,7 @@ class NaturalEarthSource(BaseDataSource):
                 # 解压GeoJSON文件
                 for file in z.namelist():
                     if file.endswith('.geojson'):
+                        print("Extracting file: ", file)
                         z.extract(file, self.CACHE_DIR)
                         return True
         except Exception as e:

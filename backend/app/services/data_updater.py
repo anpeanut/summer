@@ -149,128 +149,136 @@ class DataUpdater:
         return result
     
     # ------------------------------
-    # 数据库操作方法（直接在本类实现）
+    # 数据库操作方法（有SELECT权限的优化版）
     # ------------------------------
     def _upsert_country(self, country_data: Dict[str, Any]) -> bool:
-        """更新/插入国家基本信息（无SELECT权限实现）"""
+        print("country_data ")
+        return True # 临时跳过数据库操作，避免重复插入
+
+        """更新/插入国家基本信息（有SELECT权限优化版）"""
         country_id = country_data.get("id")
         if not country_id:
             return False
-            
-        # 先尝试更新，利用UPDATE返回行数判断是否存在记录
-        update_stmt = update(Country).where(Country.id == country_id).values({
-            "name": country_data.get("name", ""),
-            "population": country_data.get("population", 0),
-            "capital": country_data.get("capital", ""),
-            "longitude": parse_decimal(country_data.get("longitude", 0)),
-            "latitude": parse_decimal(country_data.get("latitude", 0)),
-            "data_completeness": self._calculate_completeness(country_data)
-        })
-        
+
         try:
-            # 执行更新并提交
-            result = self.db.execute(update_stmt)
+            # 使用ORM方式查询并更新/插入
+            country = self.db.query(Country).get(country_id)
+
+            if country:
+                # 更新现有记录
+                country.name = country_data.get("name", "")
+                country.population = country_data.get("population", 0)
+                country.capital = country_data.get("capital", "")
+                country.longitude = parse_decimal(country_data.get("longitude", 0))
+                country.latitude = parse_decimal(country_data.get("latitude", 0))
+                country.data_completeness = self._calculate_completeness(country_data)
+            else:
+                # 插入新记录
+                country = Country(
+                    id=country_id,
+                    name=country_data.get("name", ""),
+                    population=country_data.get("population", 0),
+                    capital=country_data.get("capital", ""),
+                    longitude=parse_decimal(country_data.get("longitude", 0)),
+                    latitude=parse_decimal(country_data.get("latitude", 0)),
+                    data_completeness=self._calculate_completeness(country_data)
+                )
+                self.db.add(country)
+
             self.db.commit()
-            
-            # 如果没有更新到记录，则执行插入
-            if result.rowcount == 0:
-                insert_stmt = insert(Country).values({
-                    "id": country_id,** update_stmt.compile().params  # 复用更新参数
-                })
-                self.db.execute(insert_stmt)
-                self.db.commit()
-                logger.info(f"Inserted new country: {country_id}")
-                
             return True
-            
+
         except SQLAlchemyError as e:
             self.db.rollback()
             logger.error(f"Country upsert failed: {str(e)}")
             return False
-    
+
     def _upsert_geojson(self, geojson_data: Dict[str, Any]) -> bool:
-        """更新/插入GeoJSON数据"""
+        print("geojson_data: ", geojson_data)
+        return True # 临时跳过数据库操作，避免重复插入
+
+        """更新/插入GeoJSON数据（有SELECT权限优化版）"""
         country_id = geojson_data.get("country_id")
         if not country_id:
             return False
-            
-        update_stmt = update(CountryGeoJSON).where(
-            CountryGeoJSON.country_id == country_id
-        ).values({
-            "feature_type": geojson_data.get("feature_type", "country_boundary"),
-            "geometry_type": geojson_data.get("geometry_type"),
-            "coordinates": geojson_data.get("coordinates", {})
-        })
-        
+
         try:
-            result = self.db.execute(update_stmt)
+            geojson = self.db.query(CountryGeoJSON).get(country_id)
+
+            if geojson:
+                geojson.feature_type = geojson_data.get("feature_type", "country_boundary")
+                geojson.geometry_type = geojson_data.get("geometry_type")
+                geojson.coordinates = geojson_data.get("coordinates", {})
+            else:
+                geojson = CountryGeoJSON(
+                    country_id=country_id,
+                    feature_type=geojson_data.get("feature_type", "country_boundary"),
+                    geometry_type=geojson_data.get("geometry_type"),
+                    coordinates=geojson_data.get("coordinates", {})
+                )
+                self.db.add(geojson)
+
             self.db.commit()
-            
-            if result.rowcount == 0:
-                insert_stmt = insert(CountryGeoJSON).values({
-                    "country_id": country_id,** update_stmt.compile().params
-                })
-                self.db.execute(insert_stmt)
-                self.db.commit()
-                
             return True
-            
+
         except SQLAlchemyError as e:
             self.db.rollback()
             logger.error(f"GeoJSON upsert failed: {str(e)}")
             return False
-    
+
     def _upsert_demographics(self, country_id: str, demo_data: Dict[str, Any]) -> bool:
-        """更新/插入人口统计数据"""
-        update_stmt = update(Demographic).where(
-            Demographic.country_id == country_id
-        ).values({
-            "urban_ratio": parse_decimal(demo_data.get("urban_ratio")),
-            "life_expectancy": parse_decimal(demo_data.get("life_expectancy")),
-            "median_age": parse_decimal(demo_data.get("median_age")),
-            "birth_rate": parse_decimal(demo_data.get("birth_rate"))
-        })
-        
+        print("demo_data ")
+        return True # 临时跳过数据库操作，避免重复插入
+
+        """更新/插入人口统计数据（有SELECT权限优化版）"""
         try:
-            result = self.db.execute(update_stmt)
+            demo = self.db.query(Demographic).get(country_id)
+
+            if demo:
+                demo.urban_ratio = parse_decimal(demo_data.get("urban_ratio"))
+                demo.life_expectancy = parse_decimal(demo_data.get("life_expectancy"))
+                demo.median_age = parse_decimal(demo_data.get("median_age"))
+                demo.birth_rate = parse_decimal(demo_data.get("birth_rate"))
+            else:
+                demo = Demographic(
+                    country_id=country_id,
+                    urban_ratio=parse_decimal(demo_data.get("urban_ratio")),
+                    life_expectancy=parse_decimal(demo_data.get("life_expectancy")),
+                    median_age=parse_decimal(demo_data.get("median_age")),
+                    birth_rate=parse_decimal(demo_data.get("birth_rate"))
+                )
+                self.db.add(demo)
+
             self.db.commit()
-            
-            if result.rowcount == 0:
-                insert_stmt = insert(Demographic).values({
-                    "country_id": country_id,** update_stmt.compile().params
-                })
-                self.db.execute(insert_stmt)
-                self.db.commit()
-                
             return True
-            
+
         except SQLAlchemyError as e:
             self.db.rollback()
             logger.error(f"Demographics upsert failed: {str(e)}")
             return False
-    
+
     def _upsert_economy(self, country_id: str, economy_data: Dict[str, Any]) -> bool:
-        """更新/插入经济数据"""
-        update_stmt = update(Economy).where(
-            Economy.country_id == country_id
-        ).values({
-            "gdp_per_capita": parse_decimal(economy_data.get("gdp_per_capita")),
-            "internet_penetration": parse_decimal(economy_data.get("internet_penetration"))
-        })
-        
+        print("economy_data ")
+        return True # 临时跳过数据库操作，避免重复插入
+
+        """更新/插入经济数据（有SELECT权限优化版）"""
         try:
-            result = self.db.execute(update_stmt)
+            economy = self.db.query(Economy).get(country_id)
+
+            if economy:
+                economy.gdp_per_capita = parse_decimal(economy_data.get("gdp_per_capita"))
+                economy.internet_penetration = parse_decimal(economy_data.get("internet_penetration"))
+            else:
+                economy = Economy(
+                    country_id=country_id,
+                    gdp_per_capita=parse_decimal(economy_data.get("gdp_per_capita")),
+                    internet_penetration=parse_decimal(economy_data.get("internet_penetration"))
+                )
+                self.db.add(economy)
+
             self.db.commit()
-            
-            if result.rowcount == 0:
-                insert_stmt = insert(Economy).values({
-                    "country_id": country_id,** update_stmt.compile().params
-                })
-                self.db.execute(insert_stmt)
-                self.db.commit()
-                
             return True
-            
+
         except SQLAlchemyError as e:
             self.db.rollback()
             logger.error(f"Economy upsert failed: {str(e)}")

@@ -12,6 +12,7 @@ class BaseDataSource(ABC):
     @abstractmethod
     def fetch_data(self, country_code: str = None) -> Dict[str, Any]:
         """获取数据抽象方法"""
+        print("Fetching data...(base)")
         pass
     
     def close(self):
