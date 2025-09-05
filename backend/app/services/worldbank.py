@@ -21,7 +21,8 @@ class WorldBankSource(BaseDataSource):
                 "urban_population": "SP.URB.TOTL.IN.ZS",  # 城市人口比例
                 "life_expectancy": "SP.DYN.LE00.IN",  # 预期寿命
                 "birth_rate": "SP.DYN.CBRT.IN",           # 出生率 (每千人)
-                "median_age": "SP.POP.TOTL.MA.ZS"         # 中位年龄
+                "median_age": "SP.POP.TOTL.MA.ZS",         # 中位年龄
+                "gender_ratio": "SP.POP.BRTH.MF"      # 女性比例
             },
             "education": {
                 "literacy_rate": "SE.ADT.LITR.ZS"  # 识字率

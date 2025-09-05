@@ -9,12 +9,12 @@ from .restcountries import RestCountriesSource
 from .worldbank import WorldBankSource
 from .naturalearth import NaturalEarthSource
 import time
+from app import db
 
 logger = get_logger(__name__)
 
 class DataUpdater:
-    def __init__(self, db_session: Session, batch_size: int = 50):
-        self.db = db_session
+    def __init__(self, batch_size: int = 50):
         self.batch_size = batch_size  # 批量处理大小
         self.sources = {
             "restcountries": RestCountriesSource(),
@@ -98,7 +98,7 @@ class DataUpdater:
                         self._upsert_economy(country_code, wb_data)
                     
                     if geojson_data and isinstance(geojson_data, dict):
-                        self._upsert_geojson(geojson_data)
+                        self._upsert_geojson(country_code, geojson_data)
 
                     self.processed_countries.add(country_code)
                     batch_result["updated"] += 1
@@ -162,7 +162,7 @@ class DataUpdater:
 
         try:
             # 使用ORM方式查询并更新/插入
-            country = self.db.query(Country).get(country_id)
+            country = db.session.query(Country).get(country_id)
 
             if country:
                 # 更新现有记录
@@ -183,27 +183,28 @@ class DataUpdater:
                     latitude=parse_decimal(country_data.get("latitude", 0)),
                     data_completeness=self._calculate_completeness(country_data)
                 )
-                self.db.add(country)
+                db.session.add(country)
 
-            self.db.commit()
+            db.session.commit()
             return True
 
         except SQLAlchemyError as e:
-            self.db.rollback()
+            db.session.rollback()
             logger.error(f"Country upsert failed: {str(e)}")
             return False
 
-    def _upsert_geojson(self, geojson_data: Dict[str, Any]) -> bool:
+    def _upsert_geojson(self, country_id: str, geojson_data: Dict[str, Any]) -> bool:
         #print("geojson_data: ", geojson_data)
         #return True # 临时跳过数据库操作，避免重复插入
 
         """更新/插入GeoJSON数据（有SELECT权限优化版）"""
-        country_id = geojson_data.get("country_id")
+        
+        print("country_id:", country_id)
         if not country_id:
             return False
 
         try:
-            geojson = self.db.query(CountryGeoJSON).get(country_id)
+            geojson = db.session.query(CountryGeoJSON).where(CountryGeoJSON.country_id == country_id).first()
 
             if geojson:
                 geojson.feature_type = 'FeatureCollection'
@@ -216,13 +217,14 @@ class DataUpdater:
                     geometry_type=geojson_data.get("geometry", {}).get("type"),
                     coordinates={"type": "FeatureCollection", "features": [geojson_data]}
                 )
-                self.db.add(geojson)
+                db.session.add(geojson)
+            print("geojson:", geojson)
 
-            self.db.commit()
+            db.session.commit()
             return True
 
         except SQLAlchemyError as e:
-            self.db.rollback()
+            db.session.rollback()
             logger.error(f"GeoJSON upsert failed: {str(e)}")
             return False
 
@@ -232,28 +234,28 @@ class DataUpdater:
 
         """更新/插入人口统计数据（有SELECT权限优化版）"""
         try:
-            demo = self.db.query(Demographic).get(country_id)
+            demo = db.session.query(Demographic).get(country_id)
 
             if demo:
-                demo.urban_ratio = parse_decimal(demo_data.get("demographics", {}).get("urban_population") / 100)
-                demo.life_expectancy = parse_decimal(demo_data.get('demographics', {}).get("life_expectancy"))
+                demo.urban_ratio = parse_decimal(demo_data.get("demographics", {}).get("urban_population") / 100) if demo_data.get("demographics", {}).get("urban_population") is not None else None
+                demo.gender_ratio = parse_decimal(demo_data.get('demographics', {}).get("gender_ratio"))
                 demo.median_age = parse_decimal(demo_data.get('demographics', {}).get("median_age"))
                 demo.birth_rate = parse_decimal(demo_data.get('demographics', {}).get("birth_rate"))
             else:
                 demo = Demographic(
                     country_id=country_id,
-                    urban_ratio=parse_decimal(demo_data.get("demographics", {}).get("urban_population") / 100),
-                    life_expectancy=parse_decimal(demo_data.get('demographics', {}).get("life_expectancy")),
+                    urban_ratio=parse_decimal(demo_data.get("demographics", {}).get("urban_population") / 100) if demo_data.get("demographics", {}).get("urban_population") is not None else None,
+                    gender_ratio=parse_decimal(demo_data.get('demographics', {}).get("gender_ratio")),
                     median_age=parse_decimal(demo_data.get('demographics', {}).get("median_age")),
                     birth_rate=parse_decimal(demo_data.get('demographics', {}).get("birth_rate"))
                 )
-                self.db.add(demo)
+                db.session.add(demo)
 
-            self.db.commit()
+            db.session.commit()
             return True
 
         except SQLAlchemyError as e:
-            self.db.rollback()
+            db.session.rollback()
             logger.error(f"Demographics upsert failed: {str(e)}")
             return False
 
@@ -263,7 +265,7 @@ class DataUpdater:
 
         """更新/插入经济数据（有SELECT权限优化版）"""
         try:
-            economy = self.db.query(Economy).get(country_id)
+            economy = db.session.query(Economy).get(country_id)
 
             if economy:
                 economy.gdp_per_capita = parse_decimal(economy_data.get("economy", {}).get("gdp"))
@@ -274,13 +276,13 @@ class DataUpdater:
                     gdp_per_capita=parse_decimal(economy_data.get("economy", {}).get("gdp")),
                     internet_penetration=parse_decimal(economy_data.get("economy", {}).get("internet_penetration"))
                 )
-                self.db.add(economy)
+                db.session.add(economy)
 
-            self.db.commit()
+            db.session.commit()
             return True
 
         except SQLAlchemyError as e:
-            self.db.rollback()
+            db.session.rollback()
             logger.error(f"Economy upsert failed: {str(e)}")
             return False
     
@@ -288,14 +290,14 @@ class DataUpdater:
         """删除国家所有数据（级联删除）"""
         try:
             # 按顺序删除关联表数据
-            self.db.execute(delete(Demographic).where(Demographic.country_id == country_id))
-            self.db.execute(delete(Economy).where(Economy.country_id == country_id))
-            self.db.execute(delete(CountryGeoJSON).where(CountryGeoJSON.country_id == country_id))
-            result = self.db.execute(delete(Country).where(Country.id == country_id))
-            self.db.commit()
+            db.session.execute(delete(Demographic).where(Demographic.country_id == country_id))
+            db.session.execute(delete(Economy).where(Economy.country_id == country_id))
+            db.session.execute(delete(CountryGeoJSON).where(CountryGeoJSON.country_id == country_id))
+            result = db.session.execute(delete(Country).where(Country.id == country_id))
+            db.session.commit()
             return result.rowcount > 0
         except SQLAlchemyError as e:
-            self.db.rollback()
+            db.session.rollback()
             logger.error(f"Delete failed: {str(e)}")
             return False
     
