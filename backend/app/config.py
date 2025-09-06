@@ -22,6 +22,10 @@ class Config:
         'pool_recycle': 3600
     }
 
+    MAX_RETRIES = 3
+
+    REQUEST_TIMEOUT = (3.05, 27) 
+
 class DevelopmentConfig(Config):
     DEBUG = True
 

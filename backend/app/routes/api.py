@@ -31,3 +31,13 @@ def country_endpoint():
             
         return jsonify(APIResponse.success(result))
     '''
+    
+
+@bp.route('/update', methods=['GET'])
+def update_endpoint():
+    """
+    更新国家数据
+    """
+    CountryService.update_country_data()
+    return jsonify(APIResponse.success("Country data update initiated."))
+    # return jsonify(APIResponse.error("501", "Not Implemented")), 501

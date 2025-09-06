@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Timeline,
   TimelineItem,
@@ -13,8 +13,8 @@ import SchoolIcon from '@mui/icons-material/School';
 import WorkIcon from '@mui/icons-material/Work';
 import StarIcon from '@mui/icons-material/Star';
 import PublicIcon from '@mui/icons-material/Public';
-import FavoriteIcon from '@mui/icons-material/Favorite'; // 新增：关系
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline'; // 新增：特殊
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { TimelineDotProps } from '@mui/lab/TimelineDot';
 
 type LifeStoryTimelineProps = {
@@ -40,37 +40,12 @@ const categoryColors: { [key: string]: TimelineDotProps['color'] } = {
     Special: 'grey',
   };
 
+// 该组件现在是一个纯粹的“展示性组件”
 function LifeStoryTimeline({ events, isLoading }: LifeStoryTimelineProps) {
-  const [visibleEvents, setVisibleEvents] = useState<LifeEvent[]>([]);
+  // 内部的 useState 和 useEffect 已被移除
 
-  useEffect(() => {
-    setVisibleEvents([]); 
-
-    if (events && events.length > 0) {
-      const interval = setInterval(() => {
-        setVisibleEvents(prevEvents => {
-          if (prevEvents.length < events.length) {
-            return [...prevEvents, events[prevEvents.length]];
-          } else {
-            clearInterval(interval);
-            return prevEvents;
-          }
-        });
-      }, 1500); 
-
-      return () => clearInterval(interval);
-    }
-  }, [events]);
-
-  if (isLoading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (visibleEvents.length === 0) {
+  // 如果事件为空或null，且不在加载中，则不渲染任何内容
+  if ((!events || events.length === 0) && !isLoading) {
     return null;
   }
 
@@ -80,17 +55,16 @@ function LifeStoryTimeline({ events, isLoading }: LifeStoryTimelineProps) {
       overflowY: 'auto',
       pr: 2,
     }}>
-      {/* 1. position 改为 "right" */}
       <Timeline position="right">
-        {visibleEvents.map((item, index) => (
-          <div key={index} className="timeline-item-appear">
+        {/* 直接遍历从 props 接收的 events */}
+        {events && events.map((item) => (
+          // 关键性能优化：使用 item.year (或其它唯一标识) 作为 key
+          <div key={item.year} className="timeline-item-appear">
             <TimelineItem sx={{
-              // 关键！通过CSS伪元素选择器，找到TimelineItem内部的占位符并移除
               '&::before': {
                 content: 'none',
               },
             }}>
-              {/* 2. TimelineOppositeContent 已被移除 */}
               <TimelineSeparator>
                 <TimelineConnector />
                 <TimelineDot color={categoryColors[item.category] || 'grey'}>
@@ -110,14 +84,12 @@ function LifeStoryTimeline({ events, isLoading }: LifeStoryTimelineProps) {
                   }}
                 >
                   <CardContent>
-                    {/* 3. 重排卡片头部 */}
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                       <Chip label={item.category} size="small" color={categoryColors[item.category] as any || 'default'} sx={{ mr: 1.5 }}/>
                       <Typography variant="body2" color="text.secondary">
                         {item.year} (年龄 {item.age})
                       </Typography>
                     </Box>
-
                     <Typography variant="body1">{item.event}</Typography>
                   </CardContent>
                 </Card>
@@ -125,9 +97,24 @@ function LifeStoryTimeline({ events, isLoading }: LifeStoryTimelineProps) {
             </TimelineItem>
           </div>
         ))}
+        
+        {/* 当正在加载时，在时间线末尾显示一个小圈圈 */}
+        {isLoading && (
+          <TimelineItem>
+            <TimelineSeparator>
+              <TimelineConnector />
+              <TimelineDot color="grey" variant="outlined">
+                <CircularProgress size={20} />
+              </TimelineDot>
+              <TimelineConnector />
+            </TimelineSeparator>
+            <TimelineContent />
+          </TimelineItem>
+        )}
       </Timeline>
     </Box>
   );
 }
 
-export default LifeStoryTimeline;
+// 推荐：使用 React.memo 包装，避免不必要的重渲染
+export default React.memo(LifeStoryTimeline);

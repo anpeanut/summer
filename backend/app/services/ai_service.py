@@ -50,7 +50,7 @@ def generate_life_story_stream(country_data, api_key, api_base):
         'Authorization': f'Bearer {api_key}'
     }
     payload = {
-        "model": "deepseek-ai/DeepSeek-V3.1",
+        "model": "deepseek-ai/DeepSeek-R1",
         "messages": [{"role": "user", "content": prompt}],
         "max_tokens": 4096,
         "stream": True,
