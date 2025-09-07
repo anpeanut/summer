@@ -7,7 +7,8 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'your-secret-key'
     # AI 服务配置
     SILICONFLOW_API_KEY = os.environ.get('SILICONFLOW_API_KEY')
-    SILICONFLOW_API_BASE = os.environ.get('SILICONFLOW_API_BASE') or "https://api.siliconflow.cn/v1/chat/completions"
+    SILICONFLOW_API_BASE = os.environ.get('SILICONFLOW_API_BASE')
+    SILICONFLOW_MODEL_NAME = os.environ.get('SILICONFLOW_MODEL_NAME') or "deepseek-ai/DeepSeek-V3"
     
     # 数据库配置
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \

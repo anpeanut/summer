@@ -29,13 +29,14 @@ def parse_ndjson_line(line: str):
         print(f"错误: 无效的流数据行，无法找到JSON对象: '{line}'")
         return None
 
-def generate_life_story_stream(country_data, api_key, api_base):
+def generate_life_story_stream(country_data, api_key, api_base, model_name):
     """
     通过直接调用API流式生成人生故事，忠实迁移前端 past.ts 的核心逻辑。
     这是一个生成器函数，会逐个产出（yield）解析后的人生事件对象。
     @param country_data: 用于生成故事的国家数据。
     @param api_key: 从应用上下文中传入的API密钥。
     @param api_base: 从应用上下文中传入的API基地址。
+    @param model_name: 从应用上下文中传入的AI模型名称。
     """
     if not api_key:
         print("错误：API密钥未提供给生成器。")
@@ -50,7 +51,7 @@ def generate_life_story_stream(country_data, api_key, api_base):
         'Authorization': f'Bearer {api_key}'
     }
     payload = {
-        "model": "deepseek-ai/DeepSeek-V3",
+        "model": model_name,
         "messages": [{"role": "user", "content": prompt}],
         "max_tokens": 4096,
         "stream": True,
