@@ -18,7 +18,7 @@ class CountryService:
     
     @staticmethod
     def update_country_data():
-        updater = DataUpdater(db, batch_size=30)  # 每批处理30个国家
+        updater = DataUpdater(batch_size=30)  # 每批处理30个国家
     
         try:
             # 执行全量批量更新
@@ -63,23 +63,29 @@ class CountryService:
         """获取国家完整数据 (ORM实现)"""
         # 使用SQLAlchemy查询国家数据（自动关联关系）
         country = Country.query.filter_by(id=country_code.upper()).first()
+        print("coordinates:", country.longitude, country.latitude if country else "N/A")
+        print("coordinates(float):", float(country.longitude) if country and country.longitude else "N/A", float(country.latitude) if country and country.latitude else "N/A")
         
         if not country:
             return False, APIResponse.error("404", "国家数据不存在")
         
-        # 构建响应数据
-        return True, {
-                "id": country.id,
-                "name": country.name,
-                "population": country.population,
-                "capital": country.capital,
-                "location": {
-                    "type": "Point",
-                    "coordinates": [float(country.longitude), float(country.latitude)]
-                },
-                "geoJson": CountryService._format_geojson(country.geojson),
-                "storySeed": CountryService._format_story_seed(country)
-            }
+        try:
+            # 构建响应数据
+            return True, {
+                    "id": country.id,
+                    "name": country.name,
+                    "population": country.population,
+                    "capital": country.capital,
+                    "location": {
+                        "type": "Point",
+                        "coordinates": [float(country.longitude), float(country.latitude)] if country.longitude is not None and country.latitude is not None else [None, None]
+                    },
+                    "geoJson": CountryService._format_geojson(country.geojson),
+                    "storySeed": CountryService._format_story_seed(country)
+                }
+        except Exception as e:
+            print(f"Error formatting country data: {str(e)}")
+            return False, APIResponse.error("500", "服务器错误，无法格式化国家数据")
     
     @staticmethod
     def _format_geojson(geojson_data):
@@ -111,8 +117,8 @@ class CountryService:
         if not demographics:
             return None
         return {
-            "gender_ratio": float(demographics.gender_ratio),
-            "urban_ratio": float(demographics.urban_ratio),
+            "gender_ratio": float(demographics.gender_ratio) if demographics.gender_ratio is not None else None,
+            "urban_ratio": float(demographics.urban_ratio) if demographics.urban_ratio is not None else None,
             "median_age": demographics.median_age
         }
     
@@ -122,8 +128,8 @@ class CountryService:
             return None
         return {
             "school_start_age": education.school_start_age,
-            "high_school_rate": float(education.high_school_rate),
-            "university_rate": float(education.university_rate)
+            "high_school_rate": float(education.high_school_rate) if education.high_school_rate is not None else None,
+            "university_rate": float(education.university_rate) if education.university_rate is not None else None
         }
     
     @staticmethod
@@ -131,8 +137,8 @@ class CountryService:
         if not country.economy:
             return None
         return {
-            "gdp_per_capita": float(country.economy.gdp_per_capita),
-            "internet_penetration": float(country.economy.internet_penetration),
+            "gdp_per_capita": float(country.economy.gdp_per_capita) if country.economy.gdp_per_capita is not None else None,
+            "internet_penetration": float(country.economy.internet_penetration) if country.economy.internet_penetration is not None else None,
             "main_industries": [i.industry_name for i in country.industries]
         }
     

@@ -97,7 +97,7 @@ class RestCountriesSource(BaseDataSource):
     @staticmethod
     def _merge_dicts(a: Dict, b: Dict) -> Dict:
         """递归合并两个字典（处理嵌套结构）"""
-        print(f"Merging dicts")
+        #print(f"Merging dicts")
         merged = a.copy()
         for key, value in b.items():
             if isinstance(value, dict) and key in merged and isinstance(merged[key], dict):
@@ -111,14 +111,14 @@ class RestCountriesSource(BaseDataSource):
 
     def _transform(self, data: Any) -> Dict[str, Any]:
         """转换数据为标准格式"""
-        print("Transforming data...")
+        #print("Transforming data...")
         if isinstance(data, list):
             return [self._transform_country(c) for c in data]
         return self._transform_country(data)
     
     def _transform_country(self, country: Dict) -> Dict:
         """转换单个国家数据"""
-        print(f"Transforming country: {country.get('cca2')}")
+        #print(f"Transforming country: {country.get('cca2')}")
         try:
             return {
                 "id": country.get("cca2", ""),

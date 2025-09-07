@@ -54,7 +54,8 @@ country_schema = {
                     }
                 }
             }
-        }
+        }, 
+        'nullable': True
     },
     'storySeed': {
         'type': 'dict',
@@ -64,39 +65,42 @@ country_schema = {
                 'type': 'dict',
                 'required': False,
                 'schema': {
-                    'gender_ratio': {'type': 'float', 'min': 0, 'max': 1},
-                    'urban_ratio': {'type': 'float', 'min': 0, 'max': 1},
-                    'median_age': {'type': 'integer', 'min': 0}
+                    'gender_ratio': {'type': 'float', 'min': 0, 'max': 1, 'default': 0.5},
+                    'urban_ratio': {'type': 'float', 'min': 0, 'max': 1, 'nullable': True},
+                    'median_age': {'type': 'integer', 'min': 0, 'nullable': True}
                 }
             },
             'education': {
                 'type': 'dict',
                 'required': False,
+                'nullable': True,
                 'schema': {
-                    'school_start_age': {'type': 'integer', 'min': 0},
-                    'high_school_rate': {'type': 'float', 'min': 0, 'max': 1},
-                    'university_rate': {'type': 'float', 'min': 0, 'max': 1}
+                    'school_start_age': {'type': 'integer', 'min': 0, 'nullable': True},
+                    'high_school_rate': {'type': 'float', 'min': 0, 'max': 1, 'nullable': True},
+                    'university_rate': {'type': 'float', 'min': 0, 'max': 1, 'nullable': True}
                 }
             },
             'environment': {
                 'type': 'dict',
                 'required': False,
                 'schema': {
-                    'gdp_per_capita': {'type': 'float', 'min': 0},
-                    'internet_penetration': {'type': 'float', 'min': 0, 'max': 1},
+                    'gdp_per_capita': {'type': 'float', 'min': 0, 'nullable': True},
+                    'internet_penetration': {'type': 'float', 'min': 0, 'max': 1, 'nullable': True},
                     'main_industries': {
                         'type': 'list',
-                        'schema': {'type': 'string', 'empty': False}
+                        'schema': {'type': 'string', 'empty': False}, 
+                        'nullable': True
                     }
                 }
             },
             'milestones': {
                 'type': 'dict',
                 'required': False,
+                'nullable': True,
                 'schema': {
-                    'avg_marriage_age': {'type': 'integer', 'min': 0},
-                    'avg_first_child_age': {'type': 'integer', 'min': 0},
-                    'life_expectancy': {'type': 'integer', 'min': 0}
+                    'avg_marriage_age': {'type': 'integer', 'min': 0, 'nullable': True},
+                    'avg_first_child_age': {'type': 'integer', 'min': 0, 'nullable': True},
+                    'life_expectancy': {'type': 'integer', 'min': 0, 'nullable': True}
                 }
             },
             'historicalEvents': {
@@ -105,11 +109,12 @@ country_schema = {
                 'schema': {
                     'type': 'dict',
                     'schema': {
-                        'name': {'type': 'string', 'empty': False},
-                        'year': {'type': 'integer'},
-                        'impact': {'type': 'string', 'empty': False}
+                        'name': {'type': 'string', 'empty': False, 'nullable': True},
+                        'year': {'type': 'integer', 'nullable': True},
+                        'impact': {'type': 'string', 'empty': False, 'nullable': True}
                     }
-                }
+                }, 
+                'nullable': True
             }
         }
     }
