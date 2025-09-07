@@ -136,7 +136,7 @@ class DataUpdater:
             # 3. 更新GeoJSON边界数据
             geojson_data = self.sources["naturalearth"].fetch_data(country_code)
             if geojson_data and isinstance(geojson_data, dict):
-                if self._upsert_geojson(geojson_data):
+                if self._upsert_geojson(country_code, geojson_data):
                     result["updated"].append("geojson")
             
             result["status"] = "success"

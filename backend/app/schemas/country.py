@@ -18,7 +18,7 @@ country_schema = {
             }
         }
     },
-    'geoJson': {
+     'geoJson': {
         'type': 'dict',
         'required': True,
         'schema': {
@@ -33,28 +33,53 @@ country_schema = {
                         'geometry': {
                             'type': 'dict',
                             'schema': {
-                                'type': {'type': 'string', 'allowed': ['Polygon']},
+                                'type': {
+                                    'type': 'string',
+                                    'allowed': ['Polygon', 'MultiPolygon']
+                                },
                                 'coordinates': {
-                                    'type': 'list',
-                                    'schema': {
-                                        'type': 'list',
-                                        'schema': {
+                                    'oneof': [  # 分类型验证
+                                        {  # Polygon 结构
                                             'type': 'list',
-                                            'items': [
-                                                {'type': 'float', 'min': -180, 'max': 180},
-                                                {'type': 'float', 'min': -90, 'max': 90}
-                                            ],
-                                            'minlength': 2,  # 确保每个点有 2 个元素
-                                            'maxlength': 2
+                                            'schema': {
+                                                'type': 'list',
+                                                'schema': {
+                                                    'type': 'list',
+                                                    'items': [
+                                                        {'type': 'float', 'min': -180, 'max': 180},
+                                                        {'type': 'float', 'min': -90, 'max': 90}
+                                                    ],
+                                                    'minlength': 2,
+                                                    'maxlength': 2
+                                                }
+                                            }
+                                        },
+                                        {  # MultiPolygon 结构
+                                            'type': 'list',
+                                            'schema': {
+                                                'type': 'list',
+                                                'schema': {
+                                                    'type': 'list',
+                                                    'schema': {
+                                                        'type': 'list',
+                                                        'items': [
+                                                            {'type': 'float', 'min': -180, 'max': 180},
+                                                            {'type': 'float', 'min': -90, 'max': 90}
+                                                        ],
+                                                        'minlength': 2,
+                                                        'maxlength': 2
+                                                    }
+                                                }
+                                            }
                                         }
-                                    }
+                                    ]
                                 }
                             }
                         }
                     }
                 }
             }
-        }, 
+        },
         'nullable': True
     },
     'storySeed': {

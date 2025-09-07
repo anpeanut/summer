@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 class NaturalEarthSource(BaseDataSource):
     BASE_URL = "https://naturalearth.s3.amazonaws.com"
+    CHINA_URL = "https://geo.datav.aliyun.com/areas_v3/bound/100000.json"
     CACHE_DIR = Path("app/static/shapefile_cache")  # 修改：缓存目录重命名为shapefile_cache
     
     def fetch_data(self, country_code: Optional[str] = None, resolution: str = "110m") -> Dict[str, Any]:
@@ -33,6 +34,17 @@ class NaturalEarthSource(BaseDataSource):
         
         # 如果请求特定国家，从Shapefile提取单个国家数据
         if country_code:
+            if country_code.upper() == "CN":
+                # 特例：中国使用GeoJSON数据源
+                try:
+                    response = requests.get(self.CHINA_URL)
+                    response.raise_for_status()
+                    print("HTTP状态码:", response.status_code)  # 应显示200
+                    print("响应前100字符:", response.text[:100])  # 查看实际返回内容
+                    return response.json().get("features", {})[0]  # 返回中国的GeoJSON数据
+                except Exception as e:
+                    logger.error(f"获取中国GeoJSON数据失败: {str(e)}")
+                    return {}
             return self._extract_country(shp_path, normalize_country_code(country_code))
         
         # 获取完整数据集（所有国家）
@@ -151,29 +163,32 @@ class NaturalEarthSource(BaseDataSource):
     def _shape_to_geojson(self, shape: shapefile.Shape) -> Optional[Dict[str, Any]]:
         """将Shapefile几何对象转换为GeoJSON几何格式"""
         try:
-            # 处理多边形（单个多边形）
-            if shape.shapeType == shapefile.POLYGON:
-                return {
-                    "type": "Polygon",
-                    "coordinates": [shape.points[i:i+shape.parts[j+1]] 
-                                   for j, i in enumerate(shape.parts[:-1])]
-                }
-            
-            # 处理多多边形（国家包含多个多边形，如岛屿）
-            elif shape.shapeType == shapefile.MULTIPOLYGON:
-                polygons = []
-                parts = shape.parts
-                for i in range(len(parts) - 1):
-                    start_idx = parts[i]
-                    end_idx = parts[i+1]
-                    polygons.append([shape.points[start_idx:end_idx]])  # 注意嵌套列表结构
-                return {"type": "MultiPolygon", "coordinates": polygons}
-            
+            # 处理多边形（单个多边形或多个部分组成的多边形）
+            if shape.shapeType in [shapefile.POLYGON, shapefile.POLYGONZ]:
+                # 检查是否有多个部分（即是否是多部分多边形）
+                if len(shape.parts) > 1:
+                    # 处理多部分多边形（如国家包含多个岛屿）
+                    polygons = []
+                    parts = list(shape.parts) + [len(shape.points)]  # 确保parts是列表
+                    for i in range(len(parts) - 1):
+                        start_idx = parts[i]
+                        end_idx = parts[i+1]
+                        # 确保每个多边形部分是列表的列表
+                        polygon_part = [list(map(list, shape.points[start_idx:end_idx]))]
+                        polygons.append(polygon_part)
+                    return {"type": "MultiPolygon", "coordinates": polygons}
+                else:
+                    # 单一部分的多边形
+                    return {
+                        "type": "Polygon",
+                        "coordinates": [list(map(list, shape.points))]  # 转换为列表的列表
+                    }
+
             # 其他几何类型（点、线等，暂不支持）
             else:
                 logger.warning(f"不支持的几何类型: {shape.shapeType}")
                 return None
-                
+
         except Exception as e:
             logger.error(f"几何数据转换失败: {str(e)}")
             return None
