@@ -65,7 +65,7 @@ function App() {
     generateLifeStory(
       countryData,
       (newEvent) => {
-        //console.log(`[${new Date().toISOString()}] LOG: App.tsx - Received event for year ${newEvent.year}, pushing to queue.`);
+        // 新事件到达时，推入队列
         eventQueueRef.current.push(newEvent);
       },
       (error) => {
@@ -74,7 +74,7 @@ function App() {
         setIsStoryLoading(false);
       },
       () => {
-        //console.log(`[${new Date().toISOString()}] LOG: App.tsx - Stream has completed.`);
+        // 数据流结束时，设置标志位
         streamCompletedRef.current = true;
       }
     );
@@ -91,14 +91,11 @@ function App() {
   useEffect(() => {
     // 仅在 isStoryLoading 状态为 true 时才运行动画循环
     if (isStoryLoading) {
-      //console.log(`[${new Date().toISOString()}] LOG: App.tsx - useEffect triggered, starting animation timer.`);
       animationTimerRef.current = setInterval(() => {
         // 优先处理队列中的事件
         if (eventQueueRef.current.length > 0) {
-          //console.log(`[${new Date().toISOString()}] LOG: App.tsx - Timer tick, queue has ${eventQueueRef.current.length} items.`);
           const nextEvent = eventQueueRef.current.shift();
           if (nextEvent) {
-           // console.log(`[${new Date().toISOString()}] LOG: App.tsx - Displaying event for year ${nextEvent.year}.`);
             // 更新 state 以触发UI渲染
             setLifeStory(prevStory => [...prevStory, nextEvent]);
           }
@@ -106,7 +103,7 @@ function App() {
           // 如果队列为空，并且数据流已结束，则停止加载并清除计时器
           setIsStoryLoading(false);
         }
-      }, 500); // 动画间隔
+      }, 10); // 动画间隔（毫秒）
     }
 
     // 清理函数：当 isStoryLoading 变为 false 或组件卸载时，确保计时器被清除
