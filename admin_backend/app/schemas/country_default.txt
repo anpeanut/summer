@@ -1,0 +1,353 @@
+#有默认值
+country_schema = {
+    # 根对象字段
+    'apiVersion': {
+        'type': 'string',
+        'required': True,
+        'allowed': ['2.0'],
+        'default': '2.0'
+    },
+    'success': {
+        'type': 'boolean',
+        'required': True,
+        'default': True
+    },
+    'timestamp': {
+        'type': 'string',
+        'required': True,
+        'regex': r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$',
+        'default': '2023-11-15T14:30:00Z'
+    },
+    'data': {
+        'type': 'dict',
+        'required': True,
+        'schema': {
+            # 国家数据核心字段
+            'id': {
+                'type': 'string',
+                'required': True,
+                'empty': False,
+                'default': 'CN'
+            },
+            'name': {
+                'type': 'string',
+                'required': True,
+                'empty': False,
+                'default': '中国'
+            },
+            'population': {
+                'type': 'integer',
+                'required': True,
+                'min': 0,
+                'default': 1412000000
+            },
+            'capital': {
+                'type': 'string',
+                'required': True,
+                'empty': False,
+                'default': '北京'
+            },
+            'location': {
+                'type': 'dict',
+                'required': True,
+                'default': {
+                    'type': 'Point',
+                    'coordinates': [104.1954, 35.8617]
+                },
+                'schema': {
+                    'type': {
+                        'type': 'string',
+                        'allowed': ['Point'],
+                        'default': 'Point'
+                    },
+                    'coordinates': {
+                        'type': 'list',
+                        'items': [
+                            {'type': 'float', 'min': -180, 'max': 180},
+                            {'type': 'float', 'min': -90, 'max': 90}
+                        ],
+                        'default': [104.1954, 35.8617]
+                    }
+                }
+            },
+            'geoJson': {
+                'type': 'dict',
+                'required': True,
+                'default': {
+                    "type": "FeatureCollection",
+                    "features": [{
+                        "type": "Feature",
+                        "properties": {},
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [[
+                                [109.6, 18.2],
+                                [109.6, 18.2],
+                                [109.6, 18.2]
+                            ]]
+                        }
+                    }]
+                },
+                'schema': {
+                    'type': {
+                        'type': 'string',
+                        'allowed': ['FeatureCollection'],
+                        'default': 'FeatureCollection'
+                    },
+                    'features': {
+                        'type': 'list',
+                        'default': [{
+                            "type": "Feature",
+                            "properties": {},
+                            "geometry": {
+                                "type": "Polygon",
+                                "coordinates": [[
+                                    [109.6, 18.2],
+                                    [109.6, 18.2],
+                                    [109.6, 18.2]
+                                ]]
+                            }
+                        }],
+                        'schema': {
+                            'type': 'dict',
+                            'schema': {
+                                'type': {
+                                    'type': 'string',
+                                    'allowed': ['Feature'],
+                                    'default': 'Feature'
+                                },
+                                'properties': {
+                                    'type': 'dict',
+                                    'default': {}
+                                },
+                                'geometry': {
+                                    'type': 'dict',
+                                    'schema': {
+                                        'type': {
+                                            'type': 'string',
+                                            'allowed': ['Polygon'],
+                                            'default': 'Polygon'
+                                        },
+                                        'coordinates': {
+                                            'type': 'list',
+                                            'schema': {
+                                                'type': 'list',
+                                                'schema': {
+                                                    'type': 'list',
+                                                    'items': [
+                                                        {'type': 'float', 'min': -180, 'max': 180},
+                                                        {'type': 'float', 'min': -90, 'max': 90}
+                                                    ],
+                                                    'default': [109.6, 18.2]
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            # 可选的故事种子字段
+            'storySeed': {
+                'type': 'dict',
+                'required': False,
+                'default': {
+                    "demographics": {
+                        "gender_ratio": 0.5,
+                        "urban_ratio": 0.55,
+                        "median_age": 38
+                    },
+                    "education": {
+                        "school_start_age": 6,
+                        "high_school_rate": 0.85,
+                        "university_rate": 0.42
+                    },
+                    "environment": {
+                        "gdp_per_capita": 12500,
+                        "internet_penetration": 0.78,
+                        "main_industries": ["制造业", "IT服务"]
+                    },
+                    "milestones": {
+                        "avg_marriage_age": 28,
+                        "avg_first_child_age": 30,
+                        "life_expectancy": 76
+                    },
+                    "historicalEvents": [
+                        {"name": "COVID-19", "year": 2020, "impact": "global"},
+                        {"name": "移动支付普及", "year": 2015, "impact": "economic"}
+                    ]
+                },
+                'schema': {
+                    'demographics': {
+                        'type': 'dict',
+                        'required': False,
+                        'default': {
+                            "gender_ratio": 0.5,
+                            "urban_ratio": 0.55,
+                            "median_age": 38
+                        },
+                        'schema': {
+                            'gender_ratio': {
+                                'type': 'float',
+                                'min': 0,
+                                'max': 1,
+                                'default': 0.5
+                            },
+                            'urban_ratio': {
+                                'type': 'float',
+                                'min': 0,
+                                'max': 1,
+                                'default': 0.55
+                            },
+                            'median_age': {
+                                'type': 'integer',
+                                'min': 0,
+                                'default': 38
+                            }
+                        }
+                    },
+                    'education': {
+                        'type': 'dict',
+                        'required': False,
+                        'default': {
+                            "school_start_age": 6,
+                            "high_school_rate": 0.85,
+                            "university_rate": 0.42
+                        },
+                        'schema': {
+                            'school_start_age': {
+                                'type': 'integer',
+                                'min': 0,
+                                'default': 6
+                            },
+                            'high_school_rate': {
+                                'type': 'float',
+                                'min': 0,
+                                'max': 1,
+                                'default': 0.85
+                            },
+                            'university_rate': {
+                                'type': 'float',
+                                'min': 0,
+                                'max': 1,
+                                'default': 0.42
+                            }
+                        }
+                    },
+                    'environment': {
+                        'type': 'dict',
+                        'required': False,
+                        'default': {
+                            "gdp_per_capita": 12500,
+                            "internet_penetration": 0.78,
+                            "main_industries": ["制造业", "IT服务"]
+                        },
+                        'schema': {
+                            'gdp_per_capita': {
+                                'type': 'float',
+                                'min': 0,
+                                'default': 12500
+                            },
+                            'internet_penetration': {
+                                'type': 'float',
+                                'min': 0,
+                                'max': 1,
+                                'default': 0.78
+                            },
+                            'main_industries': {
+                                'type': 'list',
+                                'schema': {'type': 'string', 'empty': False},
+                                'default': ["制造业", "IT服务"]
+                            }
+                        }
+                    },
+                    'milestones': {
+                        'type': 'dict',
+                        'required': False,
+                        'default': {
+                            "avg_marriage_age": 28,
+                            "avg_first_child_age": 30,
+                            "life_expectancy": 76
+                        },
+                        'schema': {
+                            'avg_marriage_age': {
+                                'type': 'integer',
+                                'min': 0,
+                                'default': 28
+                            },
+                            'avg_first_child_age': {
+                                'type': 'integer',
+                                'min': 0,
+                                'default': 30
+                            },
+                            'life_expectancy': {
+                                'type': 'integer',
+                                'min': 0,
+                                'default': 76
+                            }
+                        }
+                    },
+                    'historicalEvents': {
+                        'type': 'list',
+                        'required': False,
+                        'default': [
+                            {"name": "COVID-19", "year": 2020, "impact": "global"},
+                            {"name": "移动支付普及", "year": 2015, "impact": "economic"}
+                        ],
+                        'schema': {
+                            'type': 'dict',
+                            'schema': {
+                                'name': {
+                                    'type': 'string',
+                                    'empty': False,
+                                    'default': "历史事件"
+                                },
+                                'year': {
+                                    'type': 'integer',
+                                    'default': 2000
+                                },
+                                'impact': {
+                                    'type': 'string',
+                                    'empty': False,
+                                    'default': "general"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    'metadata': {
+        'type': 'dict',
+        'required': True,
+        'default': {
+            "source": "World Bank",
+            "license": "CC BY 4.0",
+            "dataCompleteness": 0.8
+        },
+        'schema': {
+            'source': {
+                'type': 'string',
+                'required': True,
+               ',
+                'required': True,
+                'default': "World Bank"
+            },
+            'license': {
+                'type': 'string',
+                'required': True,
+                'default': "CC BY 4.0"
+            },
+            'dataCompleteness': {
+                'type': 'float',
+                'min': 0,
+                'max': 1,
+                'required': False,
+                'default': 0.8
+            }
+        }
+    }
+}
