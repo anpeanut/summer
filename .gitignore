@@ -44,6 +44,7 @@ yarn-error.log*
 
 # 忽略后端项目中的环境变量文件
 /backend/.env
+/admin_backend/.env
 
 # 忽略所有 __pycache__ 目录
 **/__pycache__/

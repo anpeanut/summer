@@ -14,7 +14,7 @@ from app import db
 logger = get_logger(__name__)
 
 class DataUpdater:
-    def __init__(self, batch_size: int = 50):
+    def __init__(self, batch_size: int = 50, if_update_all: bool = True):
         self.batch_size = batch_size  # 批量处理大小
         self.sources = {
             "restcountries": RestCountriesSource(),
@@ -23,6 +23,7 @@ class DataUpdater:
         }
         # 存储已处理国家代码，避免重复处理
         self.processed_countries = set()
+        self.if_update_all = if_update_all
 
     # ------------------------------
     # 批量更新所有国家数据（核心接口）
@@ -66,6 +67,9 @@ class DataUpdater:
             result["end_time"] = time.strftime("%Y-%m-%d %H:%M:%S")
             logger.info(f"Batch update completed. Total: {result['total']}, "
                       f"Updated: {result['updated']}, Failed: {result['failed']}")
+            
+            print("清理临时文件...")
+            self.sources["naturalearth"]._cleanup_temp_files()
 
         except Exception as e:
             logger.error(f"Batch update failed: {str(e)}", exc_info=True)
@@ -134,7 +138,7 @@ class DataUpdater:
                     result["updated"].append("economy")
             
             # 3. 更新GeoJSON边界数据
-            geojson_data = self.sources["naturalearth"].fetch_data(country_code)
+            geojson_data = self.sources["naturalearth"].fetch_data(country_code, if_update_all = self.if_update_all)
             if geojson_data and isinstance(geojson_data, dict):
                 if self._upsert_geojson(country_code, geojson_data):
                     result["updated"].append("geojson")
@@ -154,7 +158,8 @@ class DataUpdater:
     def _upsert_country(self, country_data: Dict[str, Any]) -> bool:
         #print("country_data: ", country_data)
         #return True # 临时跳过数据库操作，避免重复插入
-
+        print('更新国家基本信息')
+        
         """更新/插入国家基本信息（有SELECT权限优化版）"""
         country_id = country_data.get("id")
         if not country_id:
@@ -162,10 +167,12 @@ class DataUpdater:
 
         try:
             # 使用ORM方式查询并更新/插入
+            print(f'查找是否已有国家{country_id}数据')
             country = db.session.query(Country).get(country_id)
 
             if country:
                 # 更新现有记录
+                print(f'更新现有的{country_id}数据')
                 country.name = country_data.get("name", "")
                 country.population = country_data.get("population", 0)
                 country.capital = country_data.get("capital", "")
@@ -174,6 +181,7 @@ class DataUpdater:
                 country.data_completeness = self._calculate_completeness(country_data)
             else:
                 # 插入新记录
+                print(f'插入{country_id}数据')
                 country = Country(
                     id=country_id,
                     name=country_data.get("name", ""),
@@ -185,7 +193,10 @@ class DataUpdater:
                 )
                 db.session.add(country)
 
+            print('更新/插入完毕')
             db.session.commit()
+
+            print('国家数据更改已提交')
             return True
 
         except SQLAlchemyError as e:
@@ -199,7 +210,7 @@ class DataUpdater:
 
         """更新/插入GeoJSON数据（有SELECT权限优化版）"""
         
-        print("country_id:", country_id)
+        print("更新geojson数据，country_id:", country_id)
         if not country_id:
             return False
 
@@ -231,6 +242,7 @@ class DataUpdater:
     def _upsert_demographics(self, country_id: str, demo_data: Dict[str, Any]) -> bool:
         #print("demo_data: ", demo_data)
         #return True # 临时跳过数据库操作，避免重复插入
+        print('更新人口统计数据')
 
         """更新/插入人口统计数据（有SELECT权限优化版）"""
         try:
@@ -262,6 +274,7 @@ class DataUpdater:
     def _upsert_economy(self, country_id: str, economy_data: Dict[str, Any]) -> bool:
         #print("economy_data: ", economy_data)
         #return True # 临时跳过数据库操作，避免重复插入
+        print('更新经济数据')
 
         """更新/插入经济数据（有SELECT权限优化版）"""
         try:

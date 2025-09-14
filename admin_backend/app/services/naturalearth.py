@@ -7,6 +7,9 @@ import io
 import os
 from pathlib import Path
 import json
+import tempfile
+import pickle
+from typing import Dict, Any, Optional, List
 import shapefile  # 新增：导入pyshp库解析Shapefile
 from shapely.geometry import shape  # 新增：处理几何数据
 from shapely.geometry.base import BaseGeometry
@@ -19,8 +22,14 @@ class NaturalEarthSource(BaseDataSource):
     BASE_URL = "https://naturalearth.s3.amazonaws.com"
     CHINA_URL = "https://geo.datav.aliyun.com/areas_v3/bound/100000.json"
     CACHE_DIR = Path("app/static/shapefile_cache")  # 修改：缓存目录重命名为shapefile_cache
+
+    def __init__(self):
+        self._index_file = None  # 索引临时文件路径
+        self._data_file = None   # 数据临时文件路径
+        self._index = {}         # 内存中的索引 {country_code: file_position}
+        self._loaded = False     # 标记是否已加载索引
     
-    def fetch_data(self, country_code: Optional[str] = None, resolution: str = "110m") -> Dict[str, Any]:
+    def fetch_data(self, country_code: Optional[str] = None, resolution: str = "110m", if_update_all: bool = True) -> Dict[str, Any]:
         """获取国家边界数据（从Shapefile解析）"""
         self._log_fetch("Natural Earth", country_code)
         
@@ -32,6 +41,14 @@ class NaturalEarthSource(BaseDataSource):
         if not shp_path:
             return {}
         
+        if not if_update_all:
+            if country_code:
+                return self._extract_country(shp_path, country_code)
+            return {}
+
+        if not self._loaded:
+            self._extract_all_countries(shp_path=shp_path)
+
         # 如果请求特定国家，从Shapefile提取单个国家数据
         if country_code:
             if country_code.upper() == "CN":
@@ -45,10 +62,40 @@ class NaturalEarthSource(BaseDataSource):
                 except Exception as e:
                     logger.error(f"获取中国GeoJSON数据失败: {str(e)}")
                     return {}
-            return self._extract_country(shp_path, normalize_country_code(country_code))
+            return self._get_country_by_code(normalize_country_code(country_code))
         
         # 获取完整数据集（所有国家）
         return self._extract_all_countries(shp_path)
+    
+    def _get_all_countries(self) -> List[Dict[str, Any]]:
+        """获取所有国家数据"""
+        if not self._loaded:
+            raise RuntimeError("请先调用 _extract_all_countries 构建索引")
+        
+        countries = []
+        try:
+            with open(self._data_file, 'r', encoding='utf-8') as data_f:
+                for line in data_f:
+                    countries.append(json.loads(line))
+            return countries
+        except Exception as e:
+            logger.error(f"获取所有国家数据失败: {str(e)}")
+            return []
+
+    def _cleanup_temp_files(self) -> None:
+        """清理临时文件"""
+        for file_path in [self._index_file, self._data_file]:
+            if file_path and os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except Exception as e:
+                    logger.warning(f"删除临时文件失败: {file_path}, 错误: {str(e)}")
+        
+        self._index_file = None
+        self._data_file = None
+        self._index = {}
+        self._loaded = False
+        logger.info("已清理临时索引文件")
     
     def _get_shapefile_path(self, resolution: str) -> Optional[str]:
         """获取Shapefile主文件(.shp)路径（从缓存或下载）"""
@@ -92,29 +139,58 @@ class NaturalEarthSource(BaseDataSource):
             return False
     
     def _extract_all_countries(self, shp_path: str) -> Dict[str, Any]:
-        """从Shapefile提取所有国家数据，转换为GeoJSON FeatureCollection"""
+        """一次性提取所有国家数据并构建索引"""
+        print('构建国家数据索引...')
+        # 如果已经加载过，先清理旧文件
+        if self._loaded:
+            self._cleanup_temp_files()
+        
+        # 创建临时文件
+        self._index_file = tempfile.mktemp(prefix="ne_country_index_", suffix=".pkl")
+        self._data_file = tempfile.mktemp(prefix="ne_country_data_", suffix=".json")
+        
         try:
-            sf = shapefile.Reader(shp_path, encoding='latin-1')  # 处理编码问题
-            fields = [f[0] for f in sf.fields[1:]]  # 获取属性字段名（排除删除标记字段）
-            features = []
+            sf = shapefile.Reader(shp_path, encoding='latin-1')
+            fields = [f[0] for f in sf.fields[1:]]
             
-            # 遍历所有国家记录
-            for record, shape in zip(sf.iterRecords(), sf.iterShapes()):
-                attributes = dict(zip(fields, record))
-                country_feature = self._create_country_feature(attributes, shape)
-                if country_feature:
-                    features.append(country_feature)
+            with open(self._data_file, 'w', encoding='utf-8') as data_f:
+                for i, (record, shape) in enumerate(zip(sf.iterRecords(), sf.iterShapes())):
+                    attributes = dict(zip(fields, record))
+                    feature = self._create_country_feature(attributes, shape)
+                    
+                    if feature:
+                        # 记录文件位置（换行符需要考虑）
+                        position = data_f.tell()
+                        
+                        # 写入JSON数据并换行
+                        json.dump(feature, data_f, ensure_ascii=False)
+                        data_f.write('\n')
+                        
+                        # 更新索引（支持ISO_A2和ISO_A3）
+                        iso_a2 = feature['properties']['iso_a2']
+                        iso_a3 = feature['properties']['iso_a3']
+                        
+                        if iso_a2:
+                            self._index[iso_a2] = position
+                        if iso_a3:
+                            self._index[iso_a3] = position
             
-            return {
-                "type": "FeatureCollection",
-                "features": features
-            }
+            # 保存索引到文件
+            with open(self._index_file, 'wb') as index_f:
+                pickle.dump(self._index, index_f)
+            
+            self._loaded = True
+            logger.info(f"成功构建国家数据索引，共索引 {len(self._index)} 个国家")
+            print(f"成功构建国家数据索引，共索引 {len(self._index)} 个国家")
+            
         except Exception as e:
-            logger.error(f"提取所有国家数据失败: {str(e)}")
-            return {}
+            self._cleanup_temp_files()
+            logger.error(f"构建国家数据索引失败: {str(e)}")
+            raise
     
     def _extract_country(self, shp_path: str, country_code: str) -> Dict[str, Any]:
         """从Shapefile提取单个国家数据"""
+        print(f"extract {country_code}...")
         try:
             sf = shapefile.Reader(shp_path, encoding='latin-1')
             fields = [f[0] for f in sf.fields[1:]]
@@ -131,6 +207,27 @@ class NaturalEarthSource(BaseDataSource):
         except Exception as e:
             logger.error(f"提取国家 {country_code} 数据失败: {str(e)}")
             return {}
+
+    def _get_country_by_code(self, country_code: str) -> Dict[str, Any]:
+        """通过国家代码快速查询国家数据"""
+        print(f'get {country_code} geojson from geojson cache')
+        if not self._loaded:
+            raise RuntimeError("请先调用 _extract_all_countries 构建索引")
+        
+        try:
+            position = self._index.get(country_code)
+            if position is None:
+                logger.warning(f"未找到国家代码: {country_code}")
+                return None
+            
+            with open(self._data_file, 'r', encoding='utf-8') as data_f:
+                data_f.seek(position)
+                line = data_f.readline()
+                return json.loads(line)
+        
+        except Exception as e:
+            logger.error(f"查询国家数据失败: {str(e)}")
+            return None
     
     def _create_country_feature(self, attributes: Dict[str, Any], shape: shapefile.Shape) -> Optional[Dict[str, Any]]:
         """将Shapefile记录转换为GeoJSON Feature"""
